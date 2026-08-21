@@ -6,42 +6,43 @@ Grössenordnung pro Jahr. **Preise beim Aufsetzen prüfen** – sie ändern sich
 
 | Posten | Tarif | Kosten/Jahr |
 |---|---|---|
-| Cloudflare Workers | Free (bis 100 000 Anfragen/Tag) | CHF 0 |
+| Cloudflare Workers | **Paid**, ca. USD 5/Monat – technisch nötig, siehe [01-architektur.md](01-architektur.md) | ca. CHF 55 |
+| Cloudflare D1 (Datenbank) | Im Workers-Paid-Kontingent enthalten, bei diesem Datenvolumen weit von den Limits entfernt | CHF 0 |
+| Cloudflare R2 (Bilder) | Free-Kontingent (10 GB) reicht für eine Schulwebseite bei Weitem | CHF 0 |
 | Cloudflare DNS + CDN + Zertifikat | Free | CHF 0 |
 | Cloudflare Web Analytics | Free | CHF 0 |
-| Supabase | Free | CHF 0 |
 | `.ch`-Domain | Schweizer Registrar | ca. CHF 10–20 |
 | Mailhosting | je nach Anbieter und Postfachzahl | ca. CHF 20–80 |
-| **Total realistisch** | | **ca. CHF 30–100** |
+| **Total realistisch** | | **ca. CHF 85–155** |
 
-Zum Vergleich: Ein Jimdo-Paket mit Domain und Mail liegt deutlich darüber. Die Umstellung
-spart der Schule also auch laufend Geld.
+Zum Vergleich: Ein Jimdo-Paket mit Domain und Mail liegt in ähnlicher oder höherer
+Grössenordnung – die Umstellung ist bei den laufenden Kosten also mindestens neutral, bei
+deutlich mehr Leistung (eigene Datenhaltung, Versionierung, Live Preview).
 
 ### Wann es teurer wird
 
 | Auslöser | Folge |
 |---|---|
-| > 100 000 Anfragen/Tag | Workers Paid, ca. USD 5/Monat. Für eine Schulwebseite unrealistisch. |
-| Supabase-Limits (Datenbankgrösse, Storage, Bandbreite) | Pro-Tarif ca. USD 25/Monat. Bei ein paar Dutzend Events pro Jahr sehr weit entfernt. |
-| Wunsch nach längeren Backups / Point-in-Time-Recovery | Supabase Pro |
+| D1-Grösse > 5 GB oder > 25 Mio. Zeilen gelesen/Tag | Workers-Paid-Kontingent überschritten, nutzungsabhängige Mehrkosten. Bei ein paar Dutzend Events pro Jahr sehr weit entfernt. |
+| R2-Speicher > 10 GB oder viel Traffic | Nutzungsabhängige Mehrkosten (R2 hat aber keine Egress-Gebühren). |
+| > 10 Mio. Worker-Anfragen/Monat | Nutzungsabhängige Mehrkosten im Workers-Paid-Tarif. Für eine Schulwebseite unrealistisch. |
 
-**Hinweis zum Supabase-Free-Tarif:** Projekte ohne jede Aktivität werden nach einer
-Woche pausiert. Eine Live-Webseite mit SSR erzeugt genug Anfragen, dass das nicht
-passiert. Relevant ist es nur für ein Dev-Projekt, das lange brachliegt – das lässt sich
-im Dashboard mit einem Klick reaktivieren.
+**Workers Paid ist ab Tag eins nötig**, nicht erst ab einer Wachstumsschwelle – siehe
+[01-architektur.md](01-architektur.md), „Bekannte Einschränkungen dieser Plattform".
 
 ## Backups
 
 | Was | Wie | Wie oft |
 |---|---|---|
 | Quellcode und Inhalte der statischen Seiten | Git / GitHub | bei jedem Commit |
-| Datenbank (Events, Seitentexte) | Supabase automatisch (Free: 7 Tage) | täglich |
-| Datenbank – eigener Export | `npx supabase db dump -f backups/JJJJ-MM-TT.sql --linked` | monatlich, ausserhalb von Supabase ablegen |
-| Event-Bilder | Bucket-Download über die Supabase-CLI oder das Dashboard | halbjährlich |
+| Datenbank (Events, Seitentexte) – Export | `pnpm wrangler d1 export natuerlich-schule --remote --output backups/JJJJ-MM-TT.sql` | monatlich, ausserhalb von Cloudflare ablegen |
+| Event-Bilder | `pnpm wrangler r2 object get` je Datei, oder ein S3-kompatibles Werkzeug (`rclone`) gegen den R2-Bucket | halbjährlich |
 | Zugangsdaten | Passwortmanager | bei jeder Änderung |
 
-Ein Restore einmal ausprobieren, bevor man ihn braucht: Dump in ein leeres Testprojekt
-einspielen und schauen, ob die Events da sind.
+D1 legt automatisch **Time Travel**-Wiederherstellungspunkte an (30 Tage Historie ohne
+eigenes Zutun) – nützlich für einen schnellen Rollback, ersetzt aber keinen externen
+Export. Ein Restore einmal ausprobieren, bevor man ihn braucht: Dump in eine lokale
+SQLite-Datei einspielen und schauen, ob die Events da sind.
 
 ## Monitoring
 
@@ -53,21 +54,21 @@ einspielen und schauen, ob die Events da sind.
 | Indexierung, kaputte Links | Google Search Console |
 | Zertifikatsablauf | Cloudflare erneuert automatisch; Uptime-Check meldet Ausfälle trotzdem |
 
-`/events` gehört ausdrücklich in die Überwachung: Nur diese Route merkt, wenn Supabase
-nicht erreichbar ist. Die statischen Seiten funktionieren dann weiter und würden ein
-Problem verdecken.
+`/events` gehört ausdrücklich in die Überwachung: Nur diese Route merkt, wenn D1 nicht
+erreichbar ist. Die statischen Seiten funktionieren dann weiter und würden ein Problem
+verdecken.
 
 ## Wartung
 
 | Intervall | Tätigkeit |
 |---|---|
-| Monatlich | `npm outdated` prüfen, Sicherheitsupdates einspielen, Preview testen, deployen |
+| Monatlich | `pnpm outdated` prüfen, Sicherheitsupdates einspielen, `pnpm preview` testen, deployen |
 | Quartalsweise | Backup-Export, kurzer Blick in Search Console und Analytics, Lighthouse |
 | Jährlich | Domain- und Hostingrechnungen prüfen, Inhalte auf Aktualität durchgehen, Zugänge im Passwortmanager verifizieren, `compatibility_date` im Worker prüfen |
 
-Astro und der Cloudflare-Adapter bekommen regelmässig grössere Versionssprünge. Diese
-nicht blind einspielen: Migrationsleitfaden lesen, auf einem Branch testen, Preview
-prüfen, dann mergen.
+Next.js, Payload und `@opennextjs/cloudflare` bekommen regelmässig grössere
+Versionssprünge. Diese nicht blind einspielen: Migrationsleitfaden lesen, auf einem
+Branch testen, `pnpm preview` in der echten Worker-Laufzeit prüfen, dann mergen.
 
 ## Zugangs-Inventar
 
@@ -76,10 +77,9 @@ Vollständig im Passwortmanager der Kundin **und** beim Entwickler. Diese Liste 
 
 - [ ] Registrar-Konto (Domain)
 - [ ] Mailhosting-Konto und alle Postfach-Passwörter
-- [ ] Cloudflare-Konto
-- [ ] Supabase-Konto + Datenbank-Passwort
+- [ ] Cloudflare-Konto (Workers, D1, R2)
 - [ ] GitHub-Repository
-- [ ] Admin-Login der Webseite (Konto der Kundin)
+- [ ] Admin-Login der Webseite (Konto der Kundin, `/admin`)
 - [ ] Google Search Console
 - [ ] Google Business Profile
 - [ ] Jimdo-Konto (bis zur Kündigung)
@@ -105,14 +105,14 @@ Entwickler kein angenehmer Zustand.
 | Symptom | Erste Vermutung | Nachschauen |
 |---|---|---|
 | Seite komplett weg | DNS oder Zertifikat | Cloudflare-Dashboard, Zone „Active"? |
-| Nur `/events` kaputt, Rest läuft | Supabase | Supabase-Status, Worker-Logs |
+| Nur `/events` kaputt, Rest läuft | D1 nicht erreichbar oder Migration fehlgeschlagen | Cloudflare-Dashboard (D1), Worker-Logs (`wrangler tail`) |
 | Änderung im Admin nicht sichtbar | Cache | Bis zu 5 Min warten oder Cache purgen |
-| Kundin kommt nicht rein | Passwort / Session | Passwort-Reset über Supabase auslösen |
+| Kundin kommt nicht rein | Passwort / Session | Passwort-Reset über den Payload-Admin (`/admin` → „Passwort vergessen") auslösen |
 | Mail kommt nicht an | MX-Records | `dig MX domain.ch`, MXToolbox |
 | Mail landet im Spam | SPF/DKIM | mail-tester.com |
-| Deploy schlägt fehl | Build oder Token | GitHub-Actions-Log |
+| Deploy schlägt fehl | Build, Bundle-Grösse oder Token | GitHub-Actions-Log |
 
 ## Verwandte Dokumente
 
 - Kosten und Limits des Deployments → [06-deployment.md](06-deployment.md)
-- Datenbank-Backups im Detail → [03-supabase.md](03-supabase.md)
+- Datenmodell und Migrationen im Detail → [03-payload.md](03-payload.md)

@@ -62,12 +62,16 @@ ohne dass etwas Halbfertiges online geht.
 2. Warten, bis die Vorschau erscheint.
 3. **Bildbeschreibung** ausfüllen.
 
-**Das müssen Sie nicht beachten:** Bildgrösse und Dateiformat. Die Webseite verkleinert
-Fotos automatisch, damit die Seite schnell bleibt. Sie können ein Foto direkt vom Handy
-oder aus der Kamera nehmen.
+**Das sollten Sie beachten:** Die Webseite verkleinert Fotos **nicht** automatisch – ein
+Foto direkt von der Handykamera ist oft mehrere Megabyte gross und macht die Seite
+langsam. Bringen Sie das Bild vorher auf etwa 1600 Pixel Breite:
 
-**Das sollten Sie beachten:** Querformat sieht besser aus als Hochformat. Und bei Fotos
-von Kindern muss die Einwilligung der Eltern vorliegen.
+- **Am Handy:** Beim Teilen/Versenden „Mittlere Grösse" statt „Originalgrösse" wählen.
+- **Am Mac:** Vorschau öffnen → Werkzeuge → Grösse korrigieren.
+- **Unter Windows:** Foto mit der rechten Maustaste → Öffnen mit „Fotos" → Grösse ändern.
+
+Querformat sieht besser aus als Hochformat. Und bei Fotos von Kindern muss die
+Einwilligung der Eltern vorliegen.
 
 ---
 

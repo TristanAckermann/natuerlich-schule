@@ -80,7 +80,8 @@ Umsetzung:
 - **Analytics cookielos** (Cloudflare Web Analytics) → **kein Cookie-Banner nötig**.
 - Nur die Admin-Konsole setzt Cookies (Session), und zwar nur für eingeloggte Redaktion –
   technisch notwendig, nicht einwilligungspflichtig.
-- **Supabase-Region EU** (Frankfurt), damit die Daten in Europa bleiben.
+- **Alle Daten bleiben bei Cloudflare** (D1-Datenbank, R2-Speicher) – kein zweiter Anbieter,
+  keine zusätzliche Datenübermittlung an Dritte.
 - Fotos von Kindern: Einwilligungen sind Sache der Schule; im Übergabedokument erwähnt.
 
 ## Verwandte Dokumente

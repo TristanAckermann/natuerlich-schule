@@ -26,7 +26,7 @@ URL-Liste beschaffen über:
 
 ## Schritt 2 – Texte und Bilder holen
 
-**Texte** per Copy-Paste in Markdown-Dateien oder direkt in die Astro-Seiten. Dabei:
+**Texte** per Copy-Paste direkt in die Next.js-Seiten unter `src/app/(frontend)/`. Dabei:
 
 - Überschriftenhierarchie sauber setzen (ein `h1`, darunter `h2`, `h3`).
 - Bleiwüsten in Absätze und Listen gliedern.
@@ -36,7 +36,7 @@ URL-Liste beschaffen über:
 
 **Bilder**: Wenn möglich die **Originale** von der Kundin holen, nicht die von Jimdo
 komprimierten Versionen. Wo das nicht geht, die grösstmögliche Variante von der Seite
-laden. Alles nach `src/assets/` und über Astros `<Image />` einbinden.
+laden. Alles nach `public/` bzw. `src/assets/` und über Next.js' `<Image />` einbinden.
 
 Für jedes Bild einen **Alternativtext** schreiben. Das macht am besten die Person, die den
 Inhalt kennt – als Zulieferung bei der Kundin einfordern.
@@ -48,7 +48,7 @@ Hinweis gehört ins Protokoll.
 ## Schritt 3 – Bestehende Events übernehmen
 
 Falls die Jimdo-Seite eine Termin- oder Aktuelles-Seite hat: die kommenden Termine als
-Events in Supabase anlegen. Beim Erstbefüllen ist das die perfekte Gelegenheit, die
+Events im Payload-Admin anlegen. Beim Erstbefüllen ist das die perfekte Gelegenheit, die
 Kundin selbst zwei oder drei Events erfassen zu lassen – das ist gleichzeitig die
 Schulung (siehe [10-anleitung-kundin.md](10-anleitung-kundin.md)).
 
@@ -60,16 +60,19 @@ Jede alte URL, die sich ändert, braucht eine **301-Weiterleitung**. Sonst verli
 Seite ihre Google-Platzierungen, und Links in E-Mails, auf Elternbriefen und in
 Facebook-Posts laufen ins Leere.
 
-Umsetzung als **Cloudflare Bulk Redirect** oder – bei wenigen Regeln – in `astro.config.mjs`:
+Umsetzung als **Cloudflare Bulk Redirect** oder – bei wenigen Regeln – über die
+`redirects()`-Funktion in `next.config.ts`:
 
-```js
-export default defineConfig({
-  redirects: {
-    '/aktuelles': '/events',
-    '/ueber-uns/team': '/team',
-    '/kontaktformular': '/kontakt',
+```ts
+const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      { source: '/aktuelles', destination: '/events', permanent: true },
+      { source: '/ueber-uns/team', destination: '/team', permanent: true },
+      { source: '/kontaktformular', destination: '/kontakt', permanent: true },
+    ]
   },
-});
+}
 ```
 
 Regeln:

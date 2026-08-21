@@ -24,21 +24,28 @@ Die endgültige Struktur ergibt sich aus dem Inventar der bestehenden Jimdo-Seit
 
 ## Layout und Komponenten
 
-```
-layouts/
-  BaseLayout.astro     <html>, Meta, Open Graph, Skip-Link, Header, Footer
-  AdminLayout.astro    Admin-Rahmen, noindex
+Struktur wie in [02-setup.md](02-setup.md) skizziert:
 
-components/
-  layout/  Header.astro (Navigation, mobiles Menü), Footer.astro, Nav.astro
-  ui/      Button.astro, Card.astro, Prose.astro, Section.astro
-  events/  EventCard.astro, EventList.astro, EventDetail.astro, EventDate.astro
-  admin/   EventForm.tsx, EventTable.tsx, ImageUpload.tsx   (React-Islands)
+```
+src/app/(frontend)/
+  layout.tsx            <html>, Meta, Open Graph, Skip-Link, Header, Footer
+  page.tsx               Startseite
+  ueber-uns/page.tsx, konzept/page.tsx, team/page.tsx, kontakt/page.tsx, …
+  events/page.tsx, events/[slug]/page.tsx
+
+src/components/
+  layout/  Header.tsx (Navigation, mobiles Menü), Footer.tsx, Nav.tsx
+  ui/      Button.tsx, Card.tsx, Prose.tsx, Section.tsx
+  events/  EventCard.tsx, EventList.tsx, EventDetail.tsx, EventDate.tsx
 ```
 
-Das mobile Menü ist die einzige Interaktivität auf den öffentlichen Seiten und wird mit
-`<details>`/`<summary>` oder ein paar Zeilen Vanilla-JS gelöst – **kein React im
-öffentlichen Bereich**.
+`(payload)` bleibt das aus dem Template mitgelieferte Admin-Layout, siehe [04-admin.md](04-admin.md).
+
+Die öffentlichen Seiten sind **React Server Components** und werden zur Build- bzw.
+Revalidierungszeit gerendert – auf den Client kommt praktisch kein JavaScript. Das mobile
+Menü ist die einzige nennenswerte Interaktivität und wird entweder mit
+`<details>`/`<summary>` oder als winzige `'use client'`-Komponente gelöst. Es gibt also
+kein React-Bundle im öffentlichen Bereich, obwohl das Framework selbst React ist.
 
 ## Design
 
@@ -70,27 +77,29 @@ Breakpoints: Tailwind-Standard. Zuerst mobil entwerfen, dann nach oben erweitern
 
 ## Events-Übersicht (`/events`)
 
-SSR. Ablauf:
+Vorgerendert, Aktualisierung über `revalidatePath()` aus dem Payload-Hook (siehe
+[03-payload.md](03-payload.md)). Ablauf:
 
-1. Titel und Einleitungstext aus `page_content` (`key = 'events.intro'`) laden.
-2. Events laden: `status = 'published'`, aufgeteilt in
-   - **Kommende** (`starts_at >= heute`), aufsteigend sortiert – zuoberst;
-   - **Vergangene** (`starts_at < heute`), absteigend, eingeklappt oder auf die letzten
+1. Titel und Einleitungstext aus dem Global `events-page` laden (Local API, siehe
+   [01-architektur.md](01-architektur.md)).
+2. Events laden: `_status = 'published'`, aufgeteilt in
+   - **Kommende** (`startsAt >= heute`), aufsteigend sortiert – zuoberst;
+   - **Vergangene** (`startsAt < heute`), absteigend, eingeklappt oder auf die letzten
      paar begrenzt.
 3. Als Karten rendern: Bild, Datum gross, Titel, Ort, Kurzbeschreibung.
 4. Leerer Zustand: „Zurzeit sind keine Veranstaltungen geplant. Schauen Sie bald wieder
    vorbei." – nie eine leere Seite.
-5. Fehlerzustand (Supabase nicht erreichbar): freundlicher Hinweistext mit Kontaktangaben,
-   Statuscode 200 aus dem `stale-while-revalidate`-Cache oder 503, aber nie ein Stacktrace.
+5. Fehlerzustand (D1 nicht erreichbar): freundlicher Hinweistext mit Kontaktangaben, aus
+   dem ISR-Cache ausgeliefert (`stale-while-revalidate`) statt eines Stacktraces.
 
 Cache-Header siehe [06-deployment.md](06-deployment.md).
 
 ## Event-Detailseite (`/events/[slug]`)
 
-- Bild, Titel, Datum/Zeit, Ort, Markdown-Text (mit `marked` gerendert und
-  **sanitisiert** – der Text stammt zwar aus vertrauenswürdiger Hand, aber HTML aus der
-  Datenbank wird grundsätzlich nicht ungefiltert eingesetzt).
-- Kein passender Slug oder `status = 'draft'` (ohne Vorschau-Session) → **404**.
+- Bild, Titel, Datum/Zeit, Ort, Rich-Text-Inhalt (Lexical-JSON aus Payload, mit dem
+  offiziellen `@payloadcms/richtext-lexical`-Renderer in HTML umgewandelt – kein
+  ungefiltertes HTML aus der Datenbank).
+- Kein passender Slug oder `_status = 'draft'` (ohne Vorschau-Session) → **404**.
 - Link zurück zur Übersicht.
 - Optional: „Zum Kalender hinzufügen" als generierte `.ics`-Datei – kleiner Aufwand,
   grosser Nutzen für Eltern. Kann in Phase 4 oder später kommen.
@@ -105,8 +114,9 @@ Alles in `Europe/Zurich`, Formatierung `de-CH` zentral in `src/lib/datum.ts`:
 | Mit Uhrzeit | `Sa, 14. März 2026, 14:00 – 17:00 Uhr` |
 | Mehrtägig | `14. – 16. März 2026` |
 
-In der Datenbank steht `timestamptz` (UTC). Die Umrechnung passiert nur bei der Ausgabe –
-sonst gibt es zur Sommerzeitumstellung Überraschungen.
+Payload speichert Datumsfelder als ISO-8601-Zeitstempel (UTC). Die Umrechnung nach
+`Europe/Zurich` passiert nur bei der Ausgabe – sonst gibt es zur Sommerzeitumstellung
+Überraschungen.
 
 ## SEO
 
@@ -114,7 +124,8 @@ sonst gibt es zur Sommerzeitumstellung Überraschungen.
   Kurzbeschreibung generiert.
 - Open-Graph- und Twitter-Card-Tags, damit geteilte Links in WhatsApp und auf Facebook
   ordentlich aussehen – für eine Schule der wichtigste Verbreitungsweg.
-- `@astrojs/sitemap` erzeugt `sitemap-index.xml`; `robots.txt` in `public/` verweist darauf.
+- `src/app/sitemap.ts` (Next.js-eigene Sitemap-Route) erzeugt `sitemap.xml`; `robots.txt`
+  in `public/` verweist darauf.
 - **JSON-LD `Event`** auf der Detailseite (`name`, `startDate`, `endDate`, `location`,
   `image`, `description`, `organizer`) – damit erscheinen Veranstaltungen in der
   Google-Suche als Termine.
@@ -124,11 +135,15 @@ sonst gibt es zur Sommerzeitumstellung Überraschungen.
 
 ## Bilder
 
-- Astros `<Image />` für alle Bilder aus dem Repo: WebP/AVIF, `width`/`height` gesetzt
-  (verhindert Layout-Sprünge), `loading="lazy"` ausser beim ersten sichtbaren Bild.
-- Event-Bilder kommen aus dem Supabase-Storage und sind bereits beim Upload verkleinert
-  (siehe [04-admin.md](04-admin.md)); auf der Seite mit fixem Seitenverhältnis (16:9)
-  und `object-fit: cover` dargestellt.
+- Statische Bilder aus dem Repo (Logo, Icons) über Next.js' `<Image />` einbinden:
+  WebP/AVIF, `width`/`height` gesetzt (verhindert Layout-Sprünge), `loading="lazy"`
+  ausser beim ersten sichtbaren Bild.
+- **Event-Bilder aus R2 nicht über `<Image />` optimieren lassen.** Next.js' eingebaute
+  Bildoptimierung braucht `sharp`, das auf Workers nicht verfügbar ist – wie bei Payloads
+  eigener Verarbeitung (siehe [04-admin.md](04-admin.md)). Für Event-Bilder deshalb ein
+  normales `<img>` (oder `<Image unoptimized>`) direkt auf die R2-URL, mit festem
+  Seitenverhältnis (16:9) und `object-fit: cover`, damit ein zu grosses Originalbild das
+  Layout nicht sprengt.
 - Jedes inhaltstragende Bild braucht ein `alt`. Dekorative Bilder bekommen `alt=""`.
 
 ## Barrierefreiheit

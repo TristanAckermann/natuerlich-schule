@@ -2,7 +2,7 @@
 
 Neue Webseite für die Schule – Ersatz für die bestehende Jimdo-Seite.
 
-Statische Webseite mit einem kleinen Backend: Die Schulleitung kann die **Events-Seite**
+Webseite mit eingebauter Redaktionsoberfläche: Die Schulleitung kann die **Events-Seite**
 selbstständig pflegen (Veranstaltungen anlegen, bearbeiten, veröffentlichen), alles andere
 ist statischer Inhalt, der über Git gepflegt wird.
 
@@ -10,27 +10,29 @@ ist statischer Inhalt, der über Git gepflegt wird.
 
 | Bereich | Technologie |
 |---|---|
-| Frontend | [Astro](https://astro.build) (statisch), React nur als Island im Admin |
+| Framework | [Next.js 16](https://nextjs.org) (App Router, React 19) |
+| CMS / Admin | [Payload 3](https://payloadcms.com) – Datenmodell, Auth, Admin-UI, Versionierung |
 | Styling | Tailwind CSS v4 |
-| Backend | [Supabase](https://supabase.com) – Postgres, Auth, Storage |
-| Hosting | Cloudflare Workers (Static Assets + SSR) |
+| Datenbank | Cloudflare D1 (SQLite) |
+| Dateien | Cloudflare R2 |
+| Hosting | Cloudflare Workers (über `@opennextjs/cloudflare`) |
 | DNS/CDN | Cloudflare |
 | Domain | `.ch`, Registrar Schweiz (nicht Cloudflare – siehe [07](docs/07-domain-und-email.md)) |
 
+**Alles auf Cloudflare** – kein Supabase, kein zweiter Anbieter, keine selbst gebaute
+Admin-Konsole. Details und Begründung → [01-architektur.md](docs/01-architektur.md).
+
 ## Quickstart
 
-```bash
-npm install
-```
+Die Anwendung liegt in [`natuerlichschulewebseite/`](natuerlichschulewebseite/):
 
 ```bash
-npm run dev
+cd natuerlichschulewebseite
+pnpm install
+pnpm dev
 ```
 
 Vorher `.env` anlegen – siehe [docs/02-setup.md](docs/02-setup.md).
-
-> **Status:** Aktuell enthält das Repo nur die Projektdokumentation. Der Code entsteht
-> ab Phase 1 der [Roadmap](docs/ROADMAP.md).
 
 ## Dokumentation
 
@@ -39,8 +41,8 @@ Vorher `.env` anlegen – siehe [docs/02-setup.md](docs/02-setup.md).
 | [00 – Scope](docs/00-scope.md) | Ziele, Nicht-Ziele, Rollen, Annahmen, offene Punkte |
 | [01 – Architektur](docs/01-architektur.md) | Systemüberblick, Rendering-Strategie, Technologieentscheide |
 | [02 – Setup](docs/02-setup.md) | Repo-Struktur, lokale Entwicklung, Konventionen |
-| [03 – Supabase](docs/03-supabase.md) | Datenmodell, SQL, RLS, Storage, Auth |
-| [04 – Admin-Konsole](docs/04-admin.md) | Routen, Login, CRUD, Bild-Upload, Cache-Purge |
+| [03 – Payload](docs/03-payload.md) | Datenmodell, Collections, Zugriffsregeln, Migrationen |
+| [04 – Redaktionsoberfläche](docs/04-admin.md) | Payload Admin konfigurieren, Live Preview, Bilder |
 | [05 – Frontend](docs/05-frontend.md) | Sitemap, Komponenten, Design, SEO, Barrierefreiheit |
 | [06 – Deployment](docs/06-deployment.md) | Cloudflare Workers, Build, Secrets, Caching |
 | [07 – Domain & E-Mail](docs/07-domain-und-email.md) | **Migration weg von Jimdo – Cutover-Runbook** |

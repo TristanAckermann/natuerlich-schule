@@ -7,10 +7,10 @@ ist, läuft die alte Seite unverändert weiter und es steht nichts unter Zeitdru
 ```
 Phase 0  Abklärung
    │
-   ├── Phase 1  Grundgerüst ──► 2 Design ──► 3 Supabase ──► 4 Events ──► 5 Admin ──► 6 Inhalte
-   │                                                                                    │
-   │                                                                     ┌──────────────┘
-   │                                                                     ▼
+   ├── Phase 1  Grundgerüst ──► 2 Design ──► 3 Payload ──► 4 Events ──► 5 Redaktion ──► 6 Inhalte
+   │                                                                                       │
+   │                                                                        ┌──────────────┘
+   │                                                                        ▼
    └────────────────────────────────► Phase 7  E-Mail ──► Phase 8  Go-Live ──► Phase 9  Übergabe
 ```
 
@@ -29,7 +29,7 @@ Zuliefern lassen und dokumentieren, bevor eine Zeile Code entsteht.
 - [ ] Logo und Bilder in Originalauflösung
 - [ ] Wer liefert Impressum und Datenschutzerklärung?
 - [ ] Go-Live-Wunschtermin (Ferienzeit bevorzugt)
-- [ ] Cloudflare-, Supabase- und GitHub-Konten angelegt
+- [ ] Cloudflare- und GitHub-Konten angelegt
 
 **Fertig, wenn:** [00-scope.md](00-scope.md) keine offenen Punkte mehr enthält.
 
@@ -37,11 +37,13 @@ Zuliefern lassen und dokumentieren, bevor eine Zeile Code entsteht.
 
 ## Phase 1 – Grundgerüst
 
-- [ ] Astro-Projekt aufsetzen, Tailwind, React, Sitemap ([02](02-setup.md))
-- [ ] Prettier, ESLint, `astro check`, `.env.example`, `.gitignore`
+- [x] Payload-Cloudflare-Template initialisiert ([02](02-setup.md))
+- [ ] Kaputten Import in `payload.config.ts` korrigieren, Platzhalter in `wrangler.jsonc`
+      ersetzen ([02](02-setup.md))
+- [ ] Prettier, ESLint, `.env.example`, `.gitignore` geprüft
 - [ ] `wrangler.jsonc`, erster manueller Deploy auf `*.workers.dev`
 - [ ] GitHub Actions: Preview bei PR, Produktion bei Push auf `main`
-- [ ] `BaseLayout`, Header, Footer, mobiles Menü, 404-Seite
+- [ ] `layout.tsx`, Header, Footer, mobiles Menü, 404-Seite
 
 **Fertig, wenn:** Ein Push auf `main` bringt automatisch eine „Hallo Welt"-Seite online.
 
@@ -60,43 +62,49 @@ Zuliefern lassen und dokumentieren, bevor eine Zeile Code entsteht.
 
 ---
 
-## Phase 3 – Supabase-Backend
+## Phase 3 – Payload-Backend
 
-- [ ] Projekt in der Region EU (Frankfurt)
-- [ ] Migrationen `0001_events`, `0002_rls`, `0003_storage` ([03](03-supabase.md))
-- [ ] **RLS als `anon` getestet**: Entwürfe unsichtbar, Schreiben verboten
-- [ ] Storage-Bucket samt Policies
-- [ ] Self-Signup deaktiviert, zwei Konten angelegt
-- [ ] Redirect-URLs für Produktion, Preview und lokal eingetragen
-- [ ] TypeScript-Typen generiert und committet
+- [ ] D1-Datenbank und R2-Buckets angelegt, `wrangler.jsonc` mit echten IDs befüllt ([06](06-deployment.md))
+- [ ] Collection `Events`, Global `EventsPage`, Zugriffsregeln ([03](03-payload.md))
+- [ ] **Zugriffsregeln als anonymer Besucher getestet**: Entwürfe unsichtbar, Schreiben verboten
+      – die Abnahmetests am Ende von [03-payload.md](03-payload.md)
+- [ ] Media-Collection mit `alt`-Pflichtfeld, Uploads auf R2
+- [ ] Offene Registrierung gesperrt, zwei Konten angelegt
+- [ ] Deutsche Oberfläche (`i18n`) eingerichtet
+- [ ] Migration erzeugt, committet und gegen die entfernte D1-Instanz angewandt
+- [ ] TypeScript-Typen generiert und committet (`pnpm generate:types`)
 
-**Fertig, wenn:** Der RLS-Test bestanden ist. Nicht vorher weitergehen.
+**Fertig, wenn:** Die Abnahmetests aus [03-payload.md](03-payload.md) bestanden sind.
+Nicht vorher weitergehen.
 
 ---
 
 ## Phase 4 – Events-Seite (öffentlich)
 
-- [ ] `/events` mit SSR, Intro-Text aus `page_content`
+- [ ] `/events`, Intro-Text aus dem Global `EventsPage` ([05](05-frontend.md))
 - [ ] Kommende und vergangene Termine getrennt und korrekt sortiert
-- [ ] `/events/[slug]` mit Markdown-Text und Bild
+- [ ] `/events/[slug]` mit Rich-Text-Inhalt und Bild
 - [ ] Datumsformatierung `de-CH`, Zeitzone `Europe/Zurich`
 - [ ] Leerer Zustand und Fehlerzustand gebaut
+- [ ] Revalidierung nach dem Speichern getestet (`revalidatePath`-Hook, [03](03-payload.md))
 - [ ] Cache-Header gesetzt und mit `curl -I` geprüft
 - [ ] JSON-LD `Event`, Meta-Tags, Open Graph
 
-**Fertig, wenn:** Ein in Supabase von Hand eingetragenes Event auf der Preview erscheint.
+**Fertig, wenn:** Ein im Payload-Admin von Hand angelegtes Event auf der Preview erscheint.
 
 ---
 
-## Phase 5 – Admin-Konsole
+## Phase 5 – Redaktionsoberfläche (Payload Admin konfigurieren)
 
-- [ ] Login mit `@supabase/ssr`, Middleware-Guard ([04](04-admin.md))
-- [ ] Event-Liste mit Status-Kennzeichnung
-- [ ] Event-Formular mit `zod`-Validierung auf beiden Seiten
-- [ ] Bild-Upload mit Verkleinerung im Browser
-- [ ] Löschen mit Rückfrage, Vorschau-Funktion
-- [ ] Seite „Seitentext" für den Intro-Block
-- [ ] Optionaler Cache-Purge nach dem Speichern
+Die Oberfläche wird nicht gebaut, sondern zugeschnitten – siehe [04-admin.md](04-admin.md).
+
+- [ ] Deutsche Beschriftungen an allen Collections, Feldern und Globals
+- [ ] Navigation gruppiert und aufgeräumt (Veranstaltungen, Events-Seite, Medien, Verwaltung)
+- [ ] Live Preview eingerichtet und mit Breakpoints (Handy/Tablet/Desktop) getestet
+- [ ] Hilfetexte (`admin.description`) an allen nicht selbsterklärenden Feldern
+- [ ] Rich-Text-Editor auf die nötigen Funktionen beschränkt
+- [ ] Branding (Titel, Favicon, ggf. Logo im Login)
+- [ ] Zugriffsregeln erneut geprüft (siehe Abnahmetests in [03-payload.md](03-payload.md))
 - [ ] Tablet-tauglich und tastaturbedienbar
 
 **Fertig, wenn:** Die Kundin legt ohne Hilfe ein Event an und veröffentlicht es.

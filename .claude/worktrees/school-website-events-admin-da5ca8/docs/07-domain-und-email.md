@@ -177,7 +177,7 @@ Direkt nach dem Umschalten:
 - [ ] 404-Seite erscheint bei Unsinn-URLs
 - [ ] Google Search Console: Property auf die neue Seite, Sitemap einreichen
 - [ ] Uptime-Monitoring aktiv (siehe [09-betrieb.md](09-betrieb.md))
-- [ ] Supabase-Login der Kundin funktioniert noch (falls Login-Adresse = Schuladresse)
+- [ ] Login der Kundin im Payload-Admin funktioniert noch (falls Login-Adresse = Schuladresse)
 
 Nach zwei Wochen:
 
