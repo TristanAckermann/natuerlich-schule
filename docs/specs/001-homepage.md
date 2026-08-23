@@ -896,6 +896,7 @@ Jeder Eintrag nennt den Grund; keine Abweichung ist stillschweigend erfolgt.
 | A11 | Das `<video>` im Hero wird erst nach der Hydration eingehängt                                                                        | Vermeidet Hydration-Abweichungen, spart den Videodownload bei `prefers-reduced-motion` und `saveData` und hält die Bandbreite für die `<h1>` frei. |
 | A12 | Der Scrim besteht aus zwei überblendeten Ebenen statt einem animierten `background`                                                  | CSS interpoliert Verläufe nicht — der Übergang aus dem Mockup wäre sonst ein harter Schnitt.                                          |
 | A13 | `robots.ts` und `sitemap.ts` liegen direkt unter `src/app/`, nicht in `(frontend)`                                                   | Bei zwei Root-Layouts registriert Next `robots.ts` innerhalb einer Routengruppe nicht — `/robots.txt` lieferte 404.                   |
+| A17 | Das Wipe-In aus 7.1 (5) ist keine gestaffelte `clip-path`-Animation mehr, sondern eine Verlaufsmaske auf den Bahnen `stage` und `band`, deren Kante `timeupdate` aus `currentTime` fortschreibt | Die Staffelung war eine Schätzung ohne Video. Mit dem gelieferten Material (Mistkäfer, der eine Kugel von links nach rechts schiebt) soll der Text dort stehen, wo die Kugel vorbei ist. Eine Animation je Element liefe in der Breite des Elements ab — fünf Elemente, fünf Geschwindigkeiten, keine davon die der Kugel. Die Maske auf den fensterbreiten Bahnen rechnet dagegen in Bildkoordinaten. |
 
 ### 16.3 Werkzeugkette (Altlasten des Templates, nebenbei behoben)
 
@@ -923,10 +924,15 @@ Jeder Eintrag nennt den Grund; keine Abweichung ist stillschweigend erfolgt.
 
 ### 16.5 Offene Punkte
 
-**BLOCKER-2 bleibt offen.** Logo, Hero-Video und Standbild fehlen weiterhin. Die Design-Schnittstelle schneidet
-Dateien bei 256 KiB ab, das Logo kam als unbrauchbares Fragment zurück. Export von Hand nötig, erwartete
-Dateinamen stehen in `docs/assets/README.md`. Der Seed überspringt fehlende Dateien mit einer Warnung, die
-Startseite bleibt funktionsfähig. Die Rechtefrage am Video (OF-3) ist ebenfalls offen.
+**BLOCKER-2 teilweise erledigt.** Hero-Video und Standbild liegen seit dem 2026-08-23 unter `docs/assets/`
+(`hero-loop.mp4`, 1536 × 864, H.264, ohne Tonspur, 2.7 MB; `hero-poster.jpg` als erstes Bild daraus). Das Logo
+fehlt weiterhin — die Design-Schnittstelle schneidet Dateien bei 256 KiB ab, es kam als unbrauchbares Fragment
+zurück, Export von Hand ist nötig. Erwartete Dateinamen stehen in `docs/assets/README.md`. Der Seed überspringt
+fehlende Dateien mit einer Warnung, die Startseite bleibt funktionsfähig.
+
+Offen am Video: die in 9.2 zusätzlich verlangte **WebM-Variante** fehlt (auf dem Rechner steht kein Encoder mit
+VP9/AV1 zur Verfügung; H.264 allein deckt alle Zielbrowser ab, kostet aber Bytes). Die Rechtefrage (OF-3) ist
+ebenfalls weiterhin offen.
 
 **Produktionsbuild und Bundle-Budget nicht lokal prüfbar.** `pnpm build` startet über
 `getPlatformProxy({ remoteBindings: true })` eine Remote-Sitzung und braucht dafür `CLOUDFLARE_API_TOKEN`

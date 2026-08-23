@@ -27,7 +27,7 @@ Alle Farben und Abstände stehen als CSS Custom Properties in
 ```bash
 npm install
 cp .env.example .env          # PAYLOAD_SECRET und PREVIEW_SECRET setzen
-npm run payload migrate       # lokale D1 aufsetzen
+z<D-z>       # lokale D1 aufsetzen
 npm run seed                  # Startseite und Globals anlegen
 npm run dev
 ```

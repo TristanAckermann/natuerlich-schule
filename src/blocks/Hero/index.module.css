@@ -10,13 +10,25 @@
  * die serverseitig gerenderten Texte.
  */
 
+/*
+ * Vorderkante der Mistkugel, als Anteil der Bahnbreite. HeroVideo.tsx schreibt
+ * den Wert während des ersten Durchlaufs fort. Die Registrierung über @property
+ * ist der Grund, warum unten überhaupt eine `transition` greift: ohne Typangabe
+ * gilt eine Custom Property als Zeichenkette und lässt sich nicht interpolieren.
+ * Das ist hier nötig, weil `timeupdate` je nach Browser nur viermal pro Sekunde
+ * feuert — die Kante liefe sonst in sichtbaren Sprüngen.
+ */
+@property --ns-hero-sweep {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 0%;
+}
+
 .section {
-  /*
-   * Dauer eines Videodurchlaufs. HeroVideo.tsx überschreibt den Wert inline,
-   * sobald die Metadaten geladen sind; 14s ist der in Spec 7.1 vorgesehene
-   * Rückfallwert.
-   */
-  --ns-hero-pass: 14s;
+  --ns-hero-sweep: 0%;
+
+  /* Weiche Kante hinter der Kugel: der Text wird aufgedeckt, nicht geschnitten. */
+  --ns-hero-feather: 9%;
 
   position: relative;
   display: flex;
@@ -25,6 +37,7 @@
   min-height: 100svh;
   overflow: hidden;
   background: var(--ns-night);
+  transition: --ns-hero-sweep 0.25s linear;
 }
 
 /* --- Hintergrundebene ---------------------------------------------------- */
@@ -221,55 +234,33 @@
 
 /* --- Wipe-In ------------------------------------------------------------- */
 
-@keyframes wipeIn {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0 -12% 0 0);
-  }
-}
-
 /*
- * Startzustand ist „idle": alles sichtbar. Erst wenn der erste Durchlauf
- * tatsächlich läuft, schaltet HeroVideo.tsx auf „armed" und die Texte fahren
- * gestaffelt ein. Ohne JavaScript und vor der Hydration fehlt damit nichts.
- * Die Verzögerungen sind Anteile der Videodauer, die Dauer ist der Rest des
- * Durchlaufs (Spec 7.1).
+ * Der Text steht dort, wo der Käfer die Kugel schon vorbeigeschoben hat.
+ *
+ * Die Maske sitzt auf den beiden Bahnen und nicht auf den Textelementen selbst.
+ * `stage` und `band` sind so breit wie das Fenster, ihre Prozentwerte sind
+ * deshalb unmittelbar Bildkoordinaten — Titel, Lead und Teaser laufen in
+ * derselben Spur auf. Läge die Maske auf den Elementen, liefe jede Zeile in
+ * ihrer eigenen Breite ab und keine wäre mit der Kugel synchron.
+ *
+ * Startzustand ist „idle": alles sichtbar, keine Maske. Erst wenn der erste
+ * Durchlauf tatsächlich läuft, schaltet HeroVideo.tsx auf „armed". Ohne
+ * JavaScript und vor der Hydration fehlt damit nichts.
  */
-.section[data-hero-state='armed'] .kicker,
-.section[data-hero-state='armed'] .title,
-.section[data-hero-state='armed'] .lead,
-.section[data-hero-state='armed'] .bandText,
-.section[data-hero-state='armed'] .bandLink {
-  animation-name: wipeIn;
-  animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
-  animation-fill-mode: both;
-}
-
-.section[data-hero-state='armed'] .kicker {
-  animation-delay: calc(var(--ns-hero-pass) * 0.02);
-  animation-duration: calc(var(--ns-hero-pass) * 0.98);
-}
-
-.section[data-hero-state='armed'] .title {
-  animation-delay: calc(var(--ns-hero-pass) * 0.06);
-  animation-duration: calc(var(--ns-hero-pass) * 0.94);
-}
-
-.section[data-hero-state='armed'] .lead {
-  animation-delay: calc(var(--ns-hero-pass) * 0.12);
-  animation-duration: calc(var(--ns-hero-pass) * 0.88);
-}
-
-.section[data-hero-state='armed'] .bandText {
-  animation-delay: calc(var(--ns-hero-pass) * 0.2);
-  animation-duration: calc(var(--ns-hero-pass) * 0.8);
-}
-
-.section[data-hero-state='armed'] .bandLink {
-  animation-delay: calc(var(--ns-hero-pass) * 0.28);
-  animation-duration: calc(var(--ns-hero-pass) * 0.72);
+.section[data-hero-state='armed'] .stage,
+.section[data-hero-state='armed'] .band {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0,
+    #000 max(0%, calc(var(--ns-hero-sweep) - var(--ns-hero-feather))),
+    transparent var(--ns-hero-sweep)
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000 0,
+    #000 max(0%, calc(var(--ns-hero-sweep) - var(--ns-hero-feather))),
+    transparent var(--ns-hero-sweep)
+  );
 }
 
 /* --- Breakpoints (Spec 4.4) ---------------------------------------------- */
