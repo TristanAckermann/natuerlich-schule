@@ -18,6 +18,7 @@ die Design-Referenz [`docs/design/startseite-mockup.md`](docs/design/startseite-
 | `src/app/(frontend)/`         | Öffentliche Seite, Design-Tokens, Reset                            |
 | `src/seed/`                   | Idempotentes Seed-Skript für Startseite und Globals                |
 | `docs/assets/`                | Medien für den Seed — siehe die README dort                        |
+| `docs/`                       | `INDEX.md` als Karte, `architecture.md`, `features/`, `project/`   |
 
 Alle Farben und Abstände stehen als CSS Custom Properties in
 `src/app/(frontend)/tokens.css`. In Komponenten gehört kein Hex-Wert.
@@ -27,7 +28,7 @@ Alle Farben und Abstände stehen als CSS Custom Properties in
 ```bash
 npm install
 cp .env.example .env          # PAYLOAD_SECRET und PREVIEW_SECRET setzen
-z<D-z>       # lokale D1 aufsetzen
+npm run payload migrate       # lokale D1 aufsetzen
 npm run seed                  # Startseite und Globals anlegen
 npm run dev
 ```

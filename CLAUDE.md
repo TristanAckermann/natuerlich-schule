@@ -1,7 +1,70 @@
-# Claude Code
+# Claude Code — Natürlich Schule
 
-This project uses the Payload CMS skill at `.claude/skills/payload/`.
-Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.claude/skills/payload/reference/` for detailed docs.
+Router, not documentation. Load deeper context only when the task needs it.
+
+## Project
+
+Payload CMS 3.88 (headless CMS + admin) on Next.js 16 App Router, React 19, TypeScript.
+Cloudflare D1 (SQLite) via `@payloadcms/db-d1-sqlite`, media on R2, deployed to Cloudflare
+Workers through OpenNext. Content, labels and code comments are German (de-CH).
+
+## Payload framework knowledge
+
+Use the installed `payload` skill (`.claude/skills/payload/`) for anything framework-level:
+fields, hooks, access control, Local API, queries, endpoints. This repo's docs describe only
+what is specific to this repository — never duplicate Payload documentation into them.
+
+## Important paths
+
+| Path | Contains |
+| --- | --- |
+| `src/payload.config.ts` | Payload config: collections, globals, D1 adapter, R2 plugin, logger |
+| `src/collections/` | `Users.ts`, `Media.ts`, `Pages.ts` |
+| `src/globals/` | `Header.ts` (navigation), `Footer.ts` |
+| `src/access/index.ts` | All access functions |
+| `src/hooks/revalidate.ts` | Cache tags and `afterChange` / `afterDelete` invalidation |
+| `src/fields/` | `link.ts` (`linkField()`), `slug.ts` (`slugField()`) |
+| `src/blocks/` | Six layout blocks: `config.ts` + `Component.tsx` + `index.module.css`, plus `RenderBlocks.tsx` |
+| `src/app/(frontend)/` | Public site, `page.tsx`, `layout.tsx`, `tokens.css`, preview route |
+| `src/app/(payload)/` | Admin and API routes — template-generated, do not hand-edit |
+| `src/components/` | `SiteHeader/`, `SiteFooter/`, `CmsLink`, `RichText`, `OrganizationJsonLd` |
+| `src/utilities/` | `getPage`, `getGlobals`, `generateMeta`, `generatePreviewPath`, `getURL`, `slugify` |
+| `src/migrations/` | D1 migrations + `index.ts` registry |
+| `src/seed/` | Idempotent seed for homepage and globals |
+| `src/payload-types.ts` | Generated — never edit by hand |
+| `tests/int/`, `tests/e2e/` | Vitest (Local API) and Playwright |
+| `docs/INDEX.md` | Repository map — the entry point for architecture context |
+
+## Context rules
+
+- Never scan the whole repository. Prefer targeted search over broad directory listings.
+- Search for the relevant file before opening anything.
+- When architecture context is needed, start at `docs/INDEX.md`, then load only the one
+  feature doc it points to.
+- Read only files relevant to the current task; follow imports only when required.
+- Do not load unrelated documentation and do not reread files already understood.
+- `docs/project/` is planning and operations material, partly ahead of the code. Never treat
+  it as truth about the current implementation.
+- Prefer existing project patterns over new abstractions.
+- Keep changes scoped to the request; never modify unrelated files.
+- Use the `payload` skill for Payload knowledge instead of restating it.
+
+## Workflow
+
+1. Locate the relevant files.
+2. Read only those files.
+3. Inspect the existing pattern before writing anything new.
+4. Implement the smallest correct change.
+5. Validate: `npm run lint`, `npm run test:int`, `npm run test:e2e` as appropriate.
+   After a schema change: `npm run generate:types` and `npm run payload migrate:create`.
+6. Review the diff.
+7. Report what changed.
+8. Provide exactly one commit message (conventional style, one line, no AI attribution).
+
+## Agents
+
+`explorer` finds files · `payload-backend` for CMS work · `frontend` for site work ·
+`database` for migrations · `reviewer` for the finished diff. See `.claude/agents/`.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
