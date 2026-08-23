@@ -1,0 +1,145 @@
+/*
+ * Design-Tokens der Natürlich Schule.
+ * Quelle: „Natürlich Schule UI-Elemente.dc.html", Abschnitt 00 Grundlagen,
+ * festgehalten in docs/specs/001-homepage.md Abschnitt 4.
+ *
+ * Kein Hex-Wert gehört in eine Komponente — alles läuft über diese Datei.
+ */
+
+:root {
+  /* Flächen */
+  --ns-paper: #f1f3ed;
+  --ns-paper-alt: #e7ede8;
+  --ns-paper-deep: #d5e2da;
+  --ns-surface: #fbfcf8;
+  --ns-mint: #dde8e2;
+  --ns-night: #1b2e28;
+
+  /* Akzente */
+  --ns-sage: #7daa9b;
+  --ns-sage-rgb: 125, 170, 155;
+  --ns-fir: #26463d;
+  --ns-fir-rgb: 38, 70, 61;
+  --ns-graphite: #2f3437;
+  --ns-graphite-rgb: 47, 52, 55;
+
+  /* Schrift */
+  --ns-ink: #24332e;
+  --ns-ink-rgb: 36, 51, 46;
+  --ns-paper-rgb: 241, 243, 237;
+  --ns-link-hover: #3d6b5c;
+
+  /* Zustände (UI-Kit) */
+  --ns-danger: #a5443a;
+  --ns-warning: #b8862f;
+  --ns-success: #3d8b62;
+
+  /* Abgeleitete Deckkraftstufen auf hellem Grund */
+  --ns-text-secondary: rgba(var(--ns-ink-rgb), 0.82);
+  --ns-text-tertiary: rgba(var(--ns-ink-rgb), 0.72);
+  --ns-text-muted: rgba(var(--ns-ink-rgb), 0.55);
+  --ns-hairline: rgba(var(--ns-ink-rgb), 0.16);
+  --ns-hairline-soft: rgba(var(--ns-ink-rgb), 0.14);
+  --ns-hairline-softer: rgba(var(--ns-ink-rgb), 0.12);
+  --ns-hairline-faint: rgba(var(--ns-ink-rgb), 0.1);
+
+  /* Abgeleitete Deckkraftstufen auf dunklem Grund */
+  --ns-on-dark: rgba(var(--ns-paper-rgb), 0.9);
+  --ns-on-dark-secondary: rgba(var(--ns-paper-rgb), 0.82);
+  --ns-on-dark-tertiary: rgba(var(--ns-paper-rgb), 0.72);
+  --ns-on-dark-hairline: rgba(var(--ns-paper-rgb), 0.22);
+
+  /*
+   * Akzentfarbe der Seite. Wird vom Hero-Block überschrieben (Spec 5.5),
+   * Standard ist Salbei.
+   */
+  --ns-accent: var(--ns-sage);
+  --ns-accent-rgb: var(--ns-sage-rgb);
+  /*
+   * Der Akzent auf dunklem Grund (Kopfzeile über dem Hero). Salbei trägt dort
+   * von sich aus 5.5:1; Tannengrün und Graphit sind zu dunkel und werden
+   * aufgehellt, sonst verschwände die aktive Unterstreichung.
+   */
+  --ns-accent-on-dark: var(--ns-sage);
+
+  /* Raster */
+  --ns-content-max: 1240px;
+  --ns-gutter: 56px;
+  --ns-section-y: 96px;
+  --ns-section-y-wide: 110px;
+  --ns-col-split: minmax(0, 300px) minmax(0, 1fr);
+  --ns-col-gap: 70px;
+
+  /* Typografie */
+  --ns-font: var(--font-rethink-sans), system-ui, sans-serif;
+  --ns-type-hero: 500 clamp(40px, 7vw, 104px) / 0.98 var(--ns-font);
+  --ns-type-h2-lg: 400 clamp(30px, 3.2vw, 44px) / 1.1 var(--ns-font);
+  --ns-type-h2-md: 400 clamp(26px, 2.6vw, 34px) / 1.15 var(--ns-font);
+  --ns-type-h2-cta: 400 clamp(28px, 3vw, 40px) / 1.1 var(--ns-font);
+  --ns-type-h3-card: 400 25px / 1.25 var(--ns-font);
+  --ns-type-quote: 400 clamp(24px, 2.8vw, 38px) / 1.35 var(--ns-font);
+  --ns-type-lead: 400 clamp(18px, 1.7vw, 24px) / 1.5 var(--ns-font);
+}
+
+/*
+ * Akzent-Varianten. RenderBlocks setzt data-accent auf einem Wrapper innerhalb
+ * von <main>; die Kopfzeile steht davor und läge sonst immer auf dem Standard.
+ * Die :has()-Regeln heben den Akzent deshalb auf das ganze Dokument.
+ */
+body:has([data-accent='sage']) {
+  --ns-accent: var(--ns-sage);
+  --ns-accent-rgb: var(--ns-sage-rgb);
+  --ns-accent-on-dark: var(--ns-sage);
+}
+
+body:has([data-accent='fir']) {
+  --ns-accent: var(--ns-fir);
+  --ns-accent-rgb: var(--ns-fir-rgb);
+  --ns-accent-on-dark: color-mix(in srgb, var(--ns-fir) 45%, var(--ns-paper));
+}
+
+body:has([data-accent='graphite']) {
+  --ns-accent: var(--ns-graphite);
+  --ns-accent-rgb: var(--ns-graphite-rgb);
+  --ns-accent-on-dark: color-mix(in srgb, var(--ns-graphite) 45%, var(--ns-paper));
+}
+
+/* Und noch einmal auf dem Wrapper selbst, für den Fall ohne :has()-Unterstützung. */
+[data-accent='sage'] {
+  --ns-accent: var(--ns-sage);
+  --ns-accent-rgb: var(--ns-sage-rgb);
+  --ns-accent-on-dark: var(--ns-sage);
+}
+
+[data-accent='fir'] {
+  --ns-accent: var(--ns-fir);
+  --ns-accent-rgb: var(--ns-fir-rgb);
+  --ns-accent-on-dark: color-mix(in srgb, var(--ns-fir) 45%, var(--ns-paper));
+}
+
+[data-accent='graphite'] {
+  --ns-accent: var(--ns-graphite);
+  --ns-accent-rgb: var(--ns-graphite-rgb);
+  --ns-accent-on-dark: color-mix(in srgb, var(--ns-graphite) 45%, var(--ns-paper));
+}
+
+@media (max-width: 1199px) {
+  :root {
+    --ns-gutter: 40px;
+  }
+}
+
+@media (max-width: 899px) {
+  :root {
+    --ns-gutter: 32px;
+    --ns-col-gap: 34px;
+  }
+}
+
+@media (max-width: 559px) {
+  :root {
+    --ns-gutter: 20px;
+    --ns-section-y: 64px;
+    --ns-section-y-wide: 72px;
+  }
+}

@@ -1,0 +1,56 @@
+/*
+ * Block „textIntro“ — zweispaltiges Textraster auf Papierhintergrund.
+ * Werte aus docs/design/startseite-mockup.md, Abschnitt `textIntro`.
+ */
+
+.section {
+  padding: var(--ns-section-y) var(--ns-gutter);
+  background: var(--ns-paper);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: var(--ns-col-split);
+  align-items: start;
+  gap: var(--ns-col-gap);
+  max-width: var(--ns-content-max);
+}
+
+.heading {
+  font: var(--ns-type-h2-lg);
+  letter-spacing: -0.02em;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  max-width: 64ch;
+  color: var(--ns-text-secondary);
+  font-size: 17.5px;
+  line-height: 1.8;
+  text-wrap: pretty;
+}
+
+/* Die Absätze holen ihren Abstand aus dem gap, nicht aus eigenen Rändern. */
+.body p {
+  margin: 0;
+}
+
+.body a {
+  color: var(--ns-fir);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.body a:hover {
+  color: var(--ns-link-hover);
+}
+
+/* Ab hier stapelt das Raster: Überschrift über dem Text (Spec 4.4). */
+@media (max-width: 899px) {
+  .inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,0 +1,41 @@
+/*
+ * Block „quote“ — Zitat auf Papierhintergrund.
+ * Werte aus docs/design/startseite-mockup.md, Abschnitt `quote`.
+ */
+
+.section {
+  padding: var(--ns-section-y-wide) var(--ns-gutter);
+  background: var(--ns-paper);
+}
+
+/*
+ * \201E ist das öffnende deutsche Anführungszeichen („),
+ * \201C das schliessende (“).
+ */
+.quote {
+  max-width: 900px;
+  color: var(--ns-fir);
+  font: var(--ns-type-quote);
+  letter-spacing: -0.015em;
+  quotes: '\201E' '\201C';
+  text-wrap: pretty;
+}
+
+.quote::before {
+  content: open-quote;
+}
+
+.quote::after {
+  content: close-quote;
+}
+
+/* .70 statt .55 aus dem Mockup — sonst reisst der Kontrast (Spec 9.1). */
+.attribution {
+  margin-top: 26px;
+  color: rgba(var(--ns-ink-rgb), 0.7);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
