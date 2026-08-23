@@ -32,6 +32,30 @@
   text-wrap: pretty;
 }
 
+/*
+ * Fliesstext ohne Überschrift: eine Spalte, um eine Stufe grössere Schrift und
+ * mehr Zeilenabstand. Der Abschnitt trägt sich damit allein, ohne dass die
+ * leere Überschriftenspalte eine Lücke hinterlässt.
+ */
+.innerProse {
+  display: grid;
+  grid-template-columns: var(--ns-col-split);
+  gap: var(--ns-col-gap);
+  max-width: var(--ns-content-max);
+}
+
+/* Der Text sitzt in derselben Spalte wie bei den Abschnitten mit Überschrift. */
+.innerProse > * {
+  grid-column: 2;
+}
+
+.bodyProse {
+  gap: 26px;
+  max-width: 62ch;
+  font-size: 19px;
+  line-height: 1.85;
+}
+
 /* Die Absätze holen ihren Abstand aus dem gap, nicht aus eigenen Rändern. */
 .body p {
   margin: 0;
@@ -50,7 +74,12 @@
 
 /* Ab hier stapelt das Raster: Überschrift über dem Text (Spec 4.4). */
 @media (max-width: 899px) {
-  .inner {
+  .inner,
+  .innerProse {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .innerProse > * {
+    grid-column: 1;
   }
 }

@@ -14,10 +14,11 @@ export const TextIntro: Block = {
       name: 'heading',
       type: 'textarea',
       admin: {
-        description: 'Zeilenumbrüche werden übernommen — das Design bricht die Überschrift bewusst um.',
+        description:
+          'Zeilenumbrüche werden übernommen — das Design bricht die Überschrift bewusst um. ' +
+          'Leer lassen für einen reinen Fliesstext-Abschnitt: der Text steht dann einspaltig und etwas grösser.',
       },
       label: 'Überschrift',
-      required: true,
     },
     {
       name: 'body',

@@ -29,6 +29,16 @@
   content: close-quote;
 }
 
+/*
+ * Lange oder mehrzeilige Zitate: eine Stufe kleiner, dafür mehr Zeilenabstand.
+ * Der Absatz bleibt luftig statt massiv.
+ */
+.quoteLong {
+  max-width: 820px;
+  font: 400 clamp(18px, 1.9vw, 27px) / 1.55 var(--ns-font);
+  letter-spacing: 0.005em;
+}
+
 /* .70 statt .55 aus dem Mockup — sonst reisst der Kontrast (Spec 9.1). */
 .attribution {
   margin-top: 26px;

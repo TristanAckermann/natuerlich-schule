@@ -30,6 +30,8 @@
 
 .text {
   max-width: 52ch;
+  /* Die Redaktion setzt die Umbrüche im Textarea selbst. */
+  white-space: pre-line;
   color: var(--ns-on-dark-secondary);
   font-size: 17px;
   line-height: 1.7;
