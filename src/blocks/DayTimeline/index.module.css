@@ -1,0 +1,83 @@
+/*
+ * Block „dayTimeline“ — Tagesablauf als Definitionsliste.
+ * Werte aus docs/design/startseite-mockup.md, Abschnitt `dayTimeline`.
+ */
+
+.section {
+  padding: var(--ns-section-y) var(--ns-gutter);
+  border-top: 1px solid var(--ns-hairline-faint);
+  border-bottom: 1px solid var(--ns-hairline-faint);
+  background: var(--ns-paper-alt);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: var(--ns-col-split);
+  align-items: start;
+  gap: var(--ns-col-gap);
+  max-width: var(--ns-content-max);
+}
+
+.heading {
+  font: var(--ns-type-h2-md);
+  letter-spacing: -0.015em;
+}
+
+.list {
+  min-width: 0;
+}
+
+/*
+ * Die Haarlinien liegen oben auf jeder Zeile; die letzte Zeile schliesst die
+ * Liste mit einer zusätzlichen Linie unten ab.
+ */
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 34px;
+  padding: 22px 0;
+  border-top: 1px solid var(--ns-hairline-soft);
+}
+
+.row:last-child {
+  border-bottom: 1px solid var(--ns-hairline-soft);
+}
+
+/* .70 statt .55 aus dem Mockup — Kontrastkorrektur nach Spec 9.1. */
+.time {
+  flex: none;
+  width: 88px;
+  color: rgba(var(--ns-ink-rgb), 0.7);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.description {
+  min-width: 0;
+  color: rgba(var(--ns-ink-rgb), 0.85);
+  font-size: 17px;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/* Ab hier stapelt das Raster: Überschrift über der Liste (Spec 4.4). */
+@media (max-width: 899px) {
+  .inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Unter 560px stehen Zeit und Beschreibung übereinander. */
+@media (max-width: 559px) {
+  .row {
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 0;
+  }
+
+  .time {
+    width: auto;
+  }
+}

@@ -1,59 +1,44 @@
-import { headers as getHeaders } from 'next/headers.js'
-import Image from 'next/image'
-import { getPayload } from 'payload'
+import type { Metadata } from 'next'
+import { draftMode } from 'next/headers'
+import { notFound } from 'next/navigation'
 import React from 'react'
-import { fileURLToPath } from 'url'
 
-import config from '@/payload.config'
-import './styles.css'
+import { RenderBlocks } from '@/blocks/RenderBlocks'
+import { HOME_SLUG } from '@/collections/Pages'
+import { OrganizationJsonLd } from '@/components/OrganizationJsonLd'
+import { generateMeta } from '@/utilities/generateMeta'
+import { getPage } from '@/utilities/getPage'
+
+/*
+ * Kein zeitbasiertes Neuaufbauen — invalidiert wird ausschliesslich on demand
+ * über die afterChange-Hooks (src/hooks/revalidate.ts).
+ *
+ * `draftMode()` ist eine dynamische API und macht die Route pro Request
+ * dynamisch. Das ist gewollt und kostet nichts: die Datenbankabfrage selbst
+ * hängt in `getPage()` an `unstable_cache` mit dem Tag `pages:home` und läuft
+ * nur nach einer Änderung erneut.
+ */
+export const revalidate = false
+
+const loadHome = async () => {
+  const { isEnabled } = await draftMode()
+  return getPage(HOME_SLUG, isEnabled)
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await loadHome()
+  return generateMeta(page, '/')
+}
 
 export default async function HomePage() {
-  const headers = await getHeaders()
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
-  const { user } = await payload.auth({ headers })
+  const page = await loadHome()
 
-  const fileURL = `vscode://file/${fileURLToPath(import.meta.url)}`
+  if (!page) notFound()
 
   return (
-    <div className="home">
-      <div className="content">
-        <picture>
-          <source srcSet="https://raw.githubusercontent.com/payloadcms/payload/3.x/packages/ui/src/assets/payload-favicon.svg" />
-          <Image
-            alt="Payload Logo"
-            height={65}
-            src="https://raw.githubusercontent.com/payloadcms/payload/3.x/packages/ui/src/assets/payload-favicon.svg"
-            width={65}
-          />
-        </picture>
-        {!user && <h1>Welcome to your new project.</h1>}
-        {user && <h1>Welcome back, {user.email}</h1>}
-        <div className="links">
-          <a
-            className="admin"
-            href={payloadConfig.routes.admin}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Go to admin panel
-          </a>
-          <a
-            className="docs"
-            href="https://payloadcms.com/docs"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Documentation
-          </a>
-        </div>
-      </div>
-      <div className="footer">
-        <p>Update this page by editing</p>
-        <a className="codeLink" href={fileURL}>
-          <code>app/(frontend)/page.tsx</code>
-        </a>
-      </div>
-    </div>
+    <>
+      <OrganizationJsonLd />
+      <RenderBlocks blocks={page.layout} />
+    </>
   )
 }

@@ -2,7 +2,7 @@
 
 | Feld           | Wert                                                                                |
 | -------------- | ----------------------------------------------------------------------------------- |
-| Status         | Draft — bereit zur Umsetzung                                                          |
+| Status         | Umgesetzt — Abweichungen und offene Punkte in Abschnitt 16                             |
 | Autor          | Tristan Ackermann                                                                     |
 | Erstellt       | 2026-08-21                                                                            |
 | Betrifft       | `natuerlichschulewebseite` (Payload 3.88 · Next 16 · D1 · R2 · Cloudflare Workers)   |
@@ -866,3 +866,81 @@ _AK:_ Startseite produktiv erreichbar, Redaktion kann alle Inhalte ändern.
 - Template-Randbedingungen: `README.md` — kein `sharp`, GraphQL-Einschränkungen, 3-MB-Bundle-Limit
 - Payload Website-Template als Referenzimplementierung für Blocks/Live Preview:
   <https://github.com/payloadcms/payload/tree/3.x/templates/website>
+
+---
+
+## 16. Abweichungen von dieser Spec
+
+Umgesetzt am 2026-08-23 auf dem Branch `feature/001-homepage`. Die folgenden Punkte weichen bewusst ab.
+Jeder Eintrag nennt den Grund; keine Abweichung ist stillschweigend erfolgt.
+
+### 16.1 Datenmodell
+
+| ID  | Abweichung                                                                                                    | Grund                                                                                                                                    |
+| --- | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| A1  | `hero.teasers[].linkLabel` entfällt; stattdessen trägt die Link-Gruppe ihr `label` mit Vorgabe `Mehr erfahren`   | Die Link-Gruppe aus 5.6 hat bereits ein Pflichtfeld `label`. Zwei Beschriftungen für einen Link wären eine Fehlerquelle für die Redaktion. |
+| A2  | `header.logo` ist optional; neu ist das Pflichtfeld `header.wordmark`                                            | Das Logo lässt sich nicht aus dem Design-Projekt exportieren (siehe 16.5). Ohne Bild zeigt die Kopfzeile die Wortmarke als Text.           |
+| A3  | Neue Gruppe `footer.organization` (Name, Strasse, PLZ, Ort, Kanton, E-Mail)                                      | 9.3 verlangt `JSON-LD` mit Adresse und E-Mail, 12 verbietet hartkodierte Inhalte. Die Gruppe ist unsichtbar und rein strukturell.           |
+| A4  | Navigations-, Teaser- und Rechtslinks nutzen `linkField({ required: false })`                                    | Abschnitt 2 hält fest, dass die Navigation vorerst auf `#` zeigt. Ein interner Link ohne Ziel ist damit ein gültiger Zwischenzustand.       |
+| A5  | `sqliteD1Adapter` bekommt `push: false`                                                                          | Der automatische Schema-Push im Dev-Modus kollidierte mit der über `payload migrate` aufgebauten lokalen D1 (`index … already exists`).     |
+
+### 16.2 Frontend und Barrierefreiheit
+
+| ID  | Abweichung                                                                                                                        | Grund                                                                                                                              |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| A6  | Karten-Kicker in `pillarCards`: `color-mix(in srgb, var(--ns-accent) 40%, var(--ns-ink))` statt reinem Akzent                        | Salbei auf `--ns-mint` ergibt **2.06:1** bei 10.5 px und fällt durch WCAG AA. Die Korrektur ergibt 5.2:1. In 9.1 nicht aufgeführt.   |
+| A7  | Zuschreibung im `quote`: `.70` statt `.55`                                                                                          | `.55` auf `--ns-paper` ergibt 3.2:1 bei 13 px. `.70` ergibt 4.8:1 — dieselbe Korrektur wie bei den Zeit-Labels in 9.1.               |
+| A8  | Rahmen der CTA-Schaltfläche: `.50` statt `.40`                                                                                       | `.40` auf Tannengrün ergibt 2.87:1, WCAG 1.4.11 verlangt 3:1 für Bedienelemente. `.50` ergibt 3.61:1.                                |
+| A9  | Neues Token `--ns-accent-on-dark`                                                                                                   | Tannengrün (1.38:1) und Graphit (1.14:1) sind auf dem dunklen Hero unsichtbar. Sie werden dort aufgehellt; Salbei bleibt unverändert. |
+| A10 | Der Akzent wird zusätzlich über `body:has([data-accent])` gesetzt                                                                    | `RenderBlocks` setzt `data-accent` innerhalb von `<main>`; die Kopfzeile steht davor und bekäme sonst immer den Standardwert.         |
+| A11 | Das `<video>` im Hero wird erst nach der Hydration eingehängt                                                                        | Vermeidet Hydration-Abweichungen, spart den Videodownload bei `prefers-reduced-motion` und `saveData` und hält die Bandbreite für die `<h1>` frei. |
+| A12 | Der Scrim besteht aus zwei überblendeten Ebenen statt einem animierten `background`                                                  | CSS interpoliert Verläufe nicht — der Übergang aus dem Mockup wäre sonst ein harter Schnitt.                                          |
+| A13 | `robots.ts` und `sitemap.ts` liegen direkt unter `src/app/`, nicht in `(frontend)`                                                   | Bei zwei Root-Layouts registriert Next `robots.ts` innerhalb einer Routengruppe nicht — `/robots.txt` lieferte 404.                   |
+
+### 16.3 Werkzeugkette (Altlasten des Templates, nebenbei behoben)
+
+| ID  | Abweichung                                                                     | Grund                                                                                                                     |
+| --- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| A14 | `eslint.config.mjs` nutzt die Flat Configs von `eslint-config-next` direkt        | Der Umweg über `FlatCompat` liess ESLint mit „Converting circular structure to JSON" abstürzen — `pnpm lint` lief nie durch. |
+| A15 | Vitest läuft im `node`-Environment mit `fileParallelism: false`                    | Unter jsdom bricht das esbuild von Wrangler ab; parallele Dateien sperren sich gegenseitig auf derselben lokalen D1.        |
+| A16 | `revalidateTag(tag, 'max')` statt `revalidateTag(tag)`                            | Next 16 verlangt ein `cacheLife`-Profil als zweites Argument.                                                               |
+
+### 16.4 Stand der Definition of Done
+
+- [x] Startseite unter `/` gerendert, visuell abgeglichen bei 1440 und 390 px
+- [x] Jeder Text, jedes Bild und jeder Link stammt aus Payload
+- [x] `lint` (0 Fehler), `test:int` (42 Tests), `test:e2e` (15 Tests, 1 bewusst übersprungen) grün
+- [x] axe: 0 kritische Verstösse auf `/`
+- [x] Migration erzeugt und registriert, `payload-types.ts` aktuell
+- [x] Seed läuft auf leerer D1 durch und ist idempotent
+- [x] `next build` erzeugt `/` als statisch vorgerenderte Route
+- [ ] Lighthouse Mobil — nicht gemessen, siehe 16.5
+- [ ] `pnpm preview` und Worker-Bundle unter 3 MB — nicht prüfbar, siehe 16.5
+- [ ] Live Preview im Admin für alle sechs Blöcke — Route und URL-Erzeugung stehen und sind gegen fehlendes
+      Geheimnis, fehlende Session und offene Weiterleitung geprüft; der Durchstich in der Admin-Oberfläche
+      steht noch aus
+- [ ] Visueller Abgleich bei 1024, 768 und 560 px sowie Zoom bis 400 %
+
+### 16.5 Offene Punkte
+
+**BLOCKER-2 bleibt offen.** Logo, Hero-Video und Standbild fehlen weiterhin. Die Design-Schnittstelle schneidet
+Dateien bei 256 KiB ab, das Logo kam als unbrauchbares Fragment zurück. Export von Hand nötig, erwartete
+Dateinamen stehen in `docs/assets/README.md`. Der Seed überspringt fehlende Dateien mit einer Warnung, die
+Startseite bleibt funktionsfähig. Die Rechtefrage am Video (OF-3) ist ebenfalls offen.
+
+**Produktionsbuild und Bundle-Budget nicht lokal prüfbar.** `pnpm build` startet über
+`getPlatformProxy({ remoteBindings: true })` eine Remote-Sitzung und braucht dafür `CLOUDFLARE_API_TOKEN`
+sowie die echte `database_id` in `wrangler.jsonc`. Gegen lokale Bindings läuft der Build fehlerfrei durch und
+rendert `/` statisch vor; die 3-MB-Grenze des Workers und `pnpm preview` sind damit noch nicht gemessen.
+Gleiches gilt für Lighthouse.
+
+**Ein E2E-Test ist bewusst übersprungen**: der redaktionelle Durchstich. `revalidateTag` läuft im
+Playwright-Prozess ausserhalb eines Next-Request-Scopes ins Leere, der Dev-Server behält seinen
+`unstable_cache`-Eintrag. Der Testkörper ist fertig und wird durch Ersetzen von `test.skip` scharf, sobald
+eine Revalidierungs-Route existiert.
+
+**Redaktionelle Fragen unverändert offen**: OF-1 (Bildauslieferung ohne `sharp`), OF-2 (finale E-Mail-Adresse),
+OF-4 (Ansprache „ihr" oder „Sie", geschlechtsneutrale Formulierungen), OF-5 (Suchfeld bis zur Suchfunktion),
+OF-6 (Impressum und Datenschutz). Der Seed übernimmt den Wortlaut aus Abschnitt 8 unverändert.
+Erfunden und von der Schule zu prüfen ist einzig der Alternativtext des Standbilds
+(`Standbild aus dem Hintergrundvideo der Startseite`) — die Media-Collection erzwingt `alt` für Bilder.

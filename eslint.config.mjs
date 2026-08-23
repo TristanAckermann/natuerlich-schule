@@ -1,17 +1,15 @@
-import { dirname } from 'path'
-import { fileURLToPath } from 'url'
-import { FlatCompat } from '@eslint/eslintrc'
+import nextCoreWebVitals from 'eslint-config-next/core-web-vitals'
+import nextTypescript from 'eslint-config-next/typescript'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  resolvePluginsRelativeTo: __dirname,
-})
-
+/*
+ * eslint-config-next 16 liefert bereits Flat Configs. Der Umweg über
+ * `FlatCompat` aus @eslint/eslintrc, den das Template mitbrachte, liess ESLint
+ * mit „Converting circular structure to JSON" abstürzen — die eslintrc-Brücke
+ * kann die neuen Configs nicht mehr normalisieren.
+ */
 const eslintConfig = [
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+  ...nextCoreWebVitals,
+  ...nextTypescript,
   {
     rules: {
       '@typescript-eslint/ban-ts-comment': 'warn',
@@ -32,7 +30,18 @@ const eslintConfig = [
     },
   },
   {
-    ignores: ['.next/', 'src/payload-types.ts', 'src/payload-generated-schema.ts'],
+    ignores: [
+      '.next/',
+      // Von `wrangler types` generiert.
+      'cloudflare-env.d.ts',
+      '.open-next/',
+      '.wrangler/',
+      'playwright-report/',
+      'test-results/',
+      'src/app/(payload)/admin/importMap.js',
+      'src/payload-types.ts',
+      'src/payload-generated-schema.ts',
+    ],
   },
 ]
 

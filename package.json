@@ -1,7 +1,7 @@
 {
   "name": "natuerlichschulewebseite",
   "version": "1.0.0",
-  "description": "A blank template to get started with Payload 3.0",
+  "description": "Website der Natürlich Schule, Privatschule Unterbach (Kanton Bern)",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -19,6 +19,7 @@
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview --env=$CLOUDFLARE_ENV",
+    "seed": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx src/seed/index.ts",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
@@ -40,6 +41,7 @@
     "@payloadcms/db-d1-sqlite": "3.88.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@eslint/eslintrc": "^3.2.0",
     "@playwright/test": "1.58.2",
     "@testing-library/react": "16.3.0",

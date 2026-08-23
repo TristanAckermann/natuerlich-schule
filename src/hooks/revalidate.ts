@@ -1,0 +1,53 @@
+import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, GlobalAfterChangeHook } from 'payload'
+import { revalidateTag } from 'next/cache'
+
+/** Cache-Tag einer Seite. */
+export const pageTag = (slug: string) => `pages:${slug}`
+/** Cache-Tag für Header und Footer zusammen. */
+export const globalsTag = 'globals'
+
+const safeRevalidate = (tag: string) => {
+  try {
+    // Next 16 verlangt ein cacheLife-Profil als zweites Argument. `updateTag`
+    // wäre die Alternative, geht aber nur aus einer Server Action heraus.
+    revalidateTag(tag, 'max')
+  } catch {
+    // Ausserhalb eines Next-Request-Scopes (CLI, Seed, Tests) gibt es nichts zu invalidieren.
+  }
+}
+
+/**
+ * Invalidiert die betroffene Seite. Wird per `context.disableRevalidate`
+ * abgeschaltet — sonst feuert jeder Autosave-Tick (alle 375 ms) eine
+ * Invalidierung.
+ */
+export const revalidatePage: CollectionAfterChangeHook = ({ context, doc, previousDoc }) => {
+  if (context?.disableRevalidate) return doc
+
+  if (doc?._status === 'published' && typeof doc.slug === 'string') {
+    safeRevalidate(pageTag(doc.slug))
+  }
+
+  // Slug geändert oder von published auf draft gewechselt: alten Eintrag ebenfalls leeren.
+  if (
+    typeof previousDoc?.slug === 'string' &&
+    previousDoc.slug !== doc?.slug &&
+    previousDoc._status === 'published'
+  ) {
+    safeRevalidate(pageTag(previousDoc.slug))
+  }
+
+  return doc
+}
+
+export const revalidatePageAfterDelete: CollectionAfterDeleteHook = ({ context, doc }) => {
+  if (context?.disableRevalidate) return doc
+  if (typeof doc?.slug === 'string') safeRevalidate(pageTag(doc.slug))
+  return doc
+}
+
+export const revalidateGlobals: GlobalAfterChangeHook = ({ context, doc }) => {
+  if (context?.disableRevalidate) return doc
+  safeRevalidate(globalsTag)
+  return doc
+}

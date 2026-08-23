@@ -10,7 +10,10 @@ import { r2Storage } from '@payloadcms/storage-r2'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
-import migrations from './db/migrations'
+import { Pages } from './collections/Pages'
+import { Header } from './globals/Header'
+import { Footer } from './globals/Footer'
+import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -50,7 +53,8 @@ const cloudflareLogger = {
   error: createLog('error', console.error),
   fatal: createLog('fatal', console.error),
   silent: () => {},
-} as any // Use PayloadLogger type when it's exported
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- PayloadLogger wird von payload nicht exportiert
+} as any
 
 const cloudflare =
   isCLI || !isProduction
@@ -64,7 +68,8 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
+  collections: [Users, Media, Pages],
+  globals: [Header, Footer],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -72,6 +77,13 @@ export default buildConfig({
   },
   db: sqliteD1Adapter({
     binding: cloudflare.env.D1,
+    prodMigrations: migrations,
+    /*
+     * Kein automatisches Schema-Push in der Entwicklung. Die lokale D1 wird wie
+     * die produktive über `payload migrate` aufgebaut; liefe zusätzlich der
+     * Dev-Push, kollidierte er mit den bereits migrierten Indizes.
+     */
+    push: false,
   }),
   logger: isProduction ? cloudflareLogger : undefined,
   plugins: [

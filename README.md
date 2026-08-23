@@ -1,3 +1,63 @@
+# Natürlich Schule — Website
+
+Website der Natürlich Schule, Privatschule Unterbach im Kanton Bern.
+Payload CMS 3.88 · Next.js 16 (App Router) · Cloudflare D1 · R2 · OpenNext auf Workers.
+
+Die Startseite ist vollständig redaktionell gepflegt: kein Text, kein Bild und kein
+Link liegt im Code. Grundlage ist [`docs/specs/001-homepage.md`](docs/specs/001-homepage.md),
+die Design-Referenz [`docs/design/startseite-mockup.md`](docs/design/startseite-mockup.md).
+
+## Aufbau
+
+| Pfad                          | Inhalt                                                             |
+| ----------------------------- | ------------------------------------------------------------------ |
+| `src/collections/`            | `users`, `media`, `pages`                                          |
+| `src/globals/`                | `header` (Navigation), `footer`                                    |
+| `src/blocks/`                 | Die sechs Blocktypen samt Rendering und CSS-Modul                  |
+| `src/fields/`                 | `linkField()` und `slugField()`                                    |
+| `src/app/(frontend)/`         | Öffentliche Seite, Design-Tokens, Reset                            |
+| `src/seed/`                   | Idempotentes Seed-Skript für Startseite und Globals                |
+| `docs/assets/`                | Medien für den Seed — siehe die README dort                        |
+
+Alle Farben und Abstände stehen als CSS Custom Properties in
+`src/app/(frontend)/tokens.css`. In Komponenten gehört kein Hex-Wert.
+
+## Lokal starten
+
+```bash
+npm install
+cp .env.example .env          # PAYLOAD_SECRET und PREVIEW_SECRET setzen
+npm run payload migrate       # lokale D1 aufsetzen
+npm run seed                  # Startseite und Globals anlegen
+npm run dev
+```
+
+Admin unter <http://localhost:3000/admin>, Website unter <http://localhost:3000>.
+
+Nach jeder Schemaänderung:
+
+```bash
+npm run generate:types && npm run payload migrate:create
+```
+
+## Tests
+
+```bash
+npm run test:int    # Vitest, Local API
+npm run test:e2e    # Playwright, inkl. axe
+```
+
+## Vor dem Deployment
+
+`wrangler.jsonc` trägt bereits den Workernamen `natuerlich-schule` sowie die
+R2-Buckets `natuerlich-schule-media` und `natuerlich-schule-cache`. Einzutragen
+bleibt die echte `database_id` der D1-Datenbank. Das Binding
+`NEXT_INC_CACHE_R2_BUCKET` ist aktiv — ohne es laufen die `revalidateTag`-Aufrufe
+aus `src/hooks/revalidate.ts` ins Leere und die Seite bleibt bis zum nächsten
+Deployment alt.
+
+---
+
 # Payload Cloudflare Template
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/payloadcms/payload/tree/3.x/templates/with-cloudflare-d1)

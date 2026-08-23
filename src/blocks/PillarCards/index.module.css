@@ -1,0 +1,70 @@
+/*
+ * Block „pillarCards“ — Kartenraster auf Haarlinien-Hintergrund.
+ * Werte aus docs/design/startseite-mockup.md, Abschnitt `pillarCards`.
+ */
+
+/*
+ * Oben ohne Abstand: der Block schliesst direkt an „textIntro“ an,
+ * dessen unteres Sektionspadding den Abstand bereits stellt.
+ */
+.section {
+  padding: 0 var(--ns-gutter) var(--ns-section-y-wide);
+  background: var(--ns-paper);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 1px;
+  max-width: var(--ns-content-max);
+  background: var(--ns-hairline-soft);
+}
+
+/*
+ * Die Flächenfarbe hängt an der Position, nicht am Inhalt (Spec 5.4):
+ * ab der dritten Karte gilt die Akzentfarbe der Seite.
+ */
+.card {
+  padding: 44px 40px;
+  background: rgba(var(--ns-accent-rgb), 0.14);
+}
+
+.card[data-position='1'] {
+  background: var(--ns-mint);
+}
+
+.card[data-position='2'] {
+  background: rgba(var(--ns-sage-rgb), 0.16);
+}
+
+/*
+ * Kontrastkorrektur über den Mockup hinaus (Spec 9.1 führt diesen Fall nicht auf):
+ * reines Salbei auf der Mintfläche ergibt 2.06:1 und fällt bei 10.5 px klar durch
+ * WCAG AA. 40 % Akzent auf Fliesstextfarbe ergibt 5.2:1 und behält den Grünton.
+ */
+.kicker {
+  margin: 0 0 12px;
+  color: color-mix(in srgb, var(--ns-accent) 40%, var(--ns-ink));
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.heading {
+  margin: 0 0 14px;
+  font: var(--ns-type-h3-card);
+}
+
+.text {
+  color: rgba(var(--ns-ink-rgb), 0.78);
+  font-size: 16.5px;
+  line-height: 1.75;
+  text-wrap: pretty;
+}
+
+@media (max-width: 559px) {
+  .card {
+    padding: 32px 24px;
+  }
+}
