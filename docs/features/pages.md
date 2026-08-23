@@ -11,6 +11,7 @@ im Code steht kein Text.
 - `src/utilities/getPage.ts` — Laden über die Local API mit Cache-Tag
 - `src/utilities/generateMeta.ts` — Next-Metadaten aus der Gruppe `meta`
 - `src/app/(frontend)/page.tsx` — die Startseite
+- `src/app/(frontend)/[slug]/page.tsx` — alle übrigen Seiten
 - `src/app/sitemap.ts` — Sitemap aus veröffentlichten Seiten
 - `src/hooks/revalidate.ts` — Invalidierung nach dem Speichern
 
@@ -24,10 +25,13 @@ Entwürfe sind aktiv, mit Autosave alle 375 ms und maximal 20 Versionen je Dokum
 
 ## Frontend
 
-Nur `/` ist als Route umgesetzt (`src/app/(frontend)/page.tsx`, lädt `HOME_SLUG`).
-Weitere Seiten lassen sich anlegen, erscheinen in der Sitemap, haben aber **noch keine
-`/[slug]`-Route**. Wer eine solche Route ergänzt, orientiert sich an `page.tsx`:
-`draftMode()`, `getPage()`, `generateMeta()`, `RenderBlocks`, `notFound()`.
+Zwei Routen: `/` (`src/app/(frontend)/page.tsx`, lädt `HOME_SLUG`) und `/[slug]`
+(`src/app/(frontend)/[slug]/page.tsx`) für alle übrigen Seiten. Beide arbeiten gleich —
+`draftMode()`, `getPage()`, `generateMeta()`, `RenderBlocks`, `notFound()` — und beide
+setzen `revalidate = false`.
+
+Die `/[slug]`-Route wirft für `home` bewusst `notFound()`: die Startseite ist unter `/`
+erreichbar und soll nicht zusätzlich unter `/home` stehen.
 
 ## Zugriff
 

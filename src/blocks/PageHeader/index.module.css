@@ -1,0 +1,50 @@
+/*
+ * Block „pageHeader“ — Seitenkopf einer Unterseite auf Papierhintergrund.
+ * Raster und Abstände entsprechen dem Auftakt, den `textIntro` mit gesetzter
+ * Überschrift erzeugt: Titel links, Lead rechts.
+ */
+
+.section {
+  padding: var(--ns-section-y) var(--ns-gutter);
+  background: var(--ns-paper);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: var(--ns-col-split);
+  align-items: start;
+  gap: var(--ns-col-gap);
+  max-width: var(--ns-content-max);
+}
+
+/* Ohne Lead trägt der Titel den Abschnitt allein und nutzt die volle Breite. */
+.innerSolo {
+  max-width: var(--ns-content-max);
+}
+
+/*
+ * Eine Stufe grösser als eine normale Abschnittsüberschrift: der Seitenkopf ist
+ * der Einstieg in die Seite und nicht bloss ein Zwischentitel.
+ */
+.heading {
+  margin: 0;
+  font: var(--ns-type-h2-lg);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.lead {
+  margin: 0;
+  max-width: 64ch;
+  color: var(--ns-text-secondary);
+  font-size: 17.5px;
+  line-height: 1.8;
+  text-wrap: pretty;
+}
+
+/* Ab hier stapelt das Raster: Titel über dem Lead (Spec 4.4). */
+@media (max-width: 899px) {
+  .inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

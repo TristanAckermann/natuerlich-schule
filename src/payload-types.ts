@@ -186,7 +186,16 @@ export interface Page {
    * Teil der URL. Leer lassen, um ihn aus dem Titel abzuleiten.
    */
   slug: string;
-  layout: (HeroBlock | TextIntroBlock | PillarCardsBlock | DayTimelineBlock | QuoteBlock | CtaBannerBlock)[];
+  layout: (
+    | HeroBlock
+    | PageHeaderBlock
+    | TextIntroBlock
+    | PillarCardsBlock
+    | DayTimelineBlock
+    | QuoteBlock
+    | CtaBannerBlock
+    | TimetableBlock
+  )[];
   meta?: {
     /**
      * Leer lassen, um den Seitentitel zu verwenden.
@@ -269,6 +278,23 @@ export interface LinkField {
   url?: string | null;
   email?: string | null;
   newTab?: boolean | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PageHeaderBlock".
+ */
+export interface PageHeaderBlock {
+  /**
+   * Der Titel der Seite. Zeilenumbrüche werden übernommen — das Design bricht die Überschrift bewusst um.
+   */
+  heading: string;
+  /**
+   * Ein bis zwei Sätze neben dem Titel. Leer lassen für einen Titel allein.
+   */
+  lead?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'pageHeader';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -376,6 +402,59 @@ export interface CtaBannerBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'ctaBanner';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TimetableBlock".
+ */
+export interface TimetableBlock {
+  heading: string;
+  /**
+   * Die Kopfzeile der Tabelle, üblicherweise Montag bis Freitag.
+   */
+  columns?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  rows?:
+    | {
+        /**
+         * Inhalt der linken Kopfspalte, z. B. 08:15-09:00. Zeilenumbrüche werden übernommen. Leer lassen für eine Zeile ohne Zeitangabe.
+         */
+        time?: string | null;
+        /**
+         * Die Zellen werden wie in HTML von links nach rechts gefüllt. Eine Zelle, die von einem Zeilen- oder Spaltenverbund einer früheren Zelle bereits überdeckt ist, wird hier NICHT noch einmal erfasst.
+         */
+        cells?:
+          | {
+              /**
+               * Leer lassen für eine leere Zelle. Zeilenumbrüche werden übernommen.
+               */
+              text?: string | null;
+              colSpan?: number | null;
+              rowSpan?: number | null;
+              variant: 'lektion' | 'pause' | 'organisation';
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Auflösung der Abkürzungen unterhalb der Tabelle.
+   */
+  legend?:
+    | {
+        abbreviation: string;
+        meaning: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'timetable';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -506,11 +585,13 @@ export interface PagesSelect<T extends boolean = true> {
     | T
     | {
         hero?: T | HeroBlockSelect<T>;
+        pageHeader?: T | PageHeaderBlockSelect<T>;
         textIntro?: T | TextIntroBlockSelect<T>;
         pillarCards?: T | PillarCardsBlockSelect<T>;
         dayTimeline?: T | DayTimelineBlockSelect<T>;
         quote?: T | QuoteBlockSelect<T>;
         ctaBanner?: T | CtaBannerBlockSelect<T>;
+        timetable?: T | TimetableBlockSelect<T>;
       };
   meta?:
     | T
@@ -559,6 +640,16 @@ export interface LinkFieldSelect<T extends boolean = true> {
   url?: T;
   email?: T;
   newTab?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PageHeaderBlock_select".
+ */
+export interface PageHeaderBlockSelect<T extends boolean = true> {
+  heading?: T;
+  lead?: T;
+  id?: T;
+  blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -621,6 +712,43 @@ export interface CtaBannerBlockSelect<T extends boolean = true> {
   heading?: T;
   text?: T;
   link?: T | LinkFieldSelect<T>;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TimetableBlock_select".
+ */
+export interface TimetableBlockSelect<T extends boolean = true> {
+  heading?: T;
+  columns?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  rows?:
+    | T
+    | {
+        time?: T;
+        cells?:
+          | T
+          | {
+              text?: T;
+              colSpan?: T;
+              rowSpan?: T;
+              variant?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  legend?:
+    | T
+    | {
+        abbreviation?: T;
+        meaning?: T;
+        id?: T;
+      };
   id?: T;
   blockName?: T;
 }
