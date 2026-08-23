@@ -235,92 +235,82 @@ const buildLayout = ({ posterId, videoId }: BuildLayoutOptions) => {
   // wird das Video deshalb weggelassen, sonst scheitert die Validierung.
   const zeigeVideo = Boolean(videoId && posterId)
 
+  /*
+   * Der Text stammt wörtlich von der Schule. Er wird ausschliesslich
+   * gegliedert — kein Satz wird umgeschrieben, gekürzt oder ergänzt.
+   * Gestaltet wird nur über Blockwahl, Schriftgrad und Fläche.
+   */
   return [
     {
       accent: 'sage' as const,
       blockType: 'hero' as const,
       heading: 'Natürlich Schule',
-      kicker: 'Privatschule Unterbach · Kanton Bern',
-      lead: 'Bauernhof, Wald, Garten. Lernen an Orten, die mitreden.',
       loopPause: 4,
       poster: posterId,
       showProgress: true,
       softenAfter: true,
+      /*
+       * Die drei Schultypen aus dem Seitenkopf, je ein Teaser. Ein Ziel gibt es
+       * noch nicht — die Linkgruppe ist Pflicht, trägt deshalb den Schultyp als
+       * Linktext und bleibt ohne Ziel im Frontend unsichtbar.
+       */
       teasers: [
-        {
-          // Ziel laut Spec: Lernorte
-          link: offenerLink('Mehr erfahren'),
-          text: 'Der Hof gibt den Takt vor: gefüttert wird, bevor gerechnet wird.',
-        },
-        {
-          // Ziel laut Spec: Grundsätzliche Pädagogik
-          link: offenerLink('Mehr erfahren'),
-          text: 'Im Wald gilt, was draussen wirklich passiert, nicht was im Buch steht.',
-        },
-        {
-          // Ziel laut Spec: Team
-          link: offenerLink('Mehr erfahren'),
-          text: 'Im Garten wächst Geduld, meistens langsamer als geplant.',
-        },
+        { link: offenerLink('Privatschule'), text: 'Privatschule' },
+        { link: offenerLink('Besondere Volksschule'), text: 'Besondere Volksschule' },
+        { link: offenerLink('Sprachheilschule'), text: 'Sprachheilschule' },
       ],
       video: zeigeVideo ? videoId : null,
     },
     {
-      blockType: 'textIntro' as const,
-      body: paragraphs(
-        'Wir sind eine kleine Privatschule im Berner Oberland, bewilligt vom Kanton Bern. Unterricht findet im Schulhaus statt, aber ebenso im Stall, im Wald und im Garten.',
-        'Die Klassen sind klein, die Wege kurz, der Tagesablauf ruhig. Wer bei uns lernt, arbeitet mit den Händen und übernimmt Verantwortung für etwas, das ohne ihn nicht funktioniert.',
-      ),
-      heading: 'Schule mit Wetter,\nTieren und Werkzeug',
-    },
-    {
-      blockType: 'pillarCards' as const,
-      cards: [
-        {
-          category: 'Hof',
-          heading: 'Tiere, die warten nicht',
-          index: '01',
-          text: 'Jeden Morgen versorgen die Kinder die Tiere, im Sommer wie im Januar.',
-        },
-        {
-          category: 'Wald',
-          heading: 'Ein Tag pro Woche draussen',
-          index: '02',
-          text: 'Werkzeug, Feuer, Karte. Der Wald korrigiert schneller als jede Note.',
-        },
-        {
-          category: 'Garten',
-          heading: 'Vom Samen bis zum Mittagessen',
-          index: '03',
-          text: 'Angebaut, geerntet, gekocht. Rechnen inklusive, weil es sonst nicht aufgeht.',
-        },
-      ],
-    },
-    {
-      blockType: 'dayTimeline' as const,
-      entries: [
-        { description: 'Stalldienst und Ankommen', time: '07:30' },
-        { description: 'Unterricht in kleinen Gruppen', time: '08:30' },
-        { description: 'Kochen und Mittagessen aus dem Garten', time: '11:45' },
-        { description: 'Projektarbeit, Werkstatt oder Wald', time: '13:30' },
-      ],
-      heading: 'Ein Tag bei uns',
-    },
-    {
-      attribution: 'Schulleitung',
       blockType: 'quote' as const,
       // Ohne Anführungszeichen — die setzt das CSS (Spec 5.4).
-      quote: 'Kinder brauchen Aufgaben, die echt sind. Alles andere merken sie sofort.',
+      quote:
+        'ERKLÄRE ES MIR, UND ICH WERDE ES VERGESSEN...\n' +
+        'ZEIGE ES MIR UND ICH WERDE MICH ERINNERN...\n' +
+        'LASS ES MICH SELBST TUN UND ICH WERDE ES VERSTEHEN.',
+    },
+    {
+      blockType: 'textIntro' as const,
+      body: paragraphs(
+        'Danke für dein Interesse an der Natürlich Schule.',
+        'Wir freuen uns Dir auf dieser Website einen Einblick in den Schulalltag der Natürlich Schule zu geben.',
+      ),
+      heading: 'Liebe/r Besucher/in\ndieser Website',
+    },
+    {
+      blockType: 'textIntro' as const,
+      body: paragraphs(
+        'Die Natürlich Schule versteht sich als Ergänzung zur Volksschule und ist eine vom Kanton Bern bewilligte Privatschule. Seit Sommer 2023 bieten wir zusätzlich zu unserem Privatschulangebot 16 Plätze der besonderen Volksschule an. Wir helfen mit den grossen Bedarf an Plätzen für Sprachheilschüler in der Region Berner Oberland abzudecken. Wir führen seit Sommer 2025 eine Klasse der Sprachheilschule mit maximal 12 Plätzen.',
+        'Somit können wir Kindern mit besonderen Bedürfnissen und Sprachschwierigkeiten durch individueller Begleitung einen Rahmen bieten, in welchem sie sich entwickeln können. Diese Kinder werden vom Inspektorat und der Bildungsdirektion der Natürlich Schule zugewiesen.',
+      ),
+    },
+    {
+      blockType: 'textIntro' as const,
+      body: paragraphs(
+        'Die Natürlich Schule baut  auf dem Fundament der Montessoripädagogik eine neue Art der Bildung auf. Freiarbeit, handlungsorientierter Unterricht und eben Montessoripädagogik werden hier miteinander verknüpft. Auch Elemente der Steinerpädagogik finden bei uns Platz. Die Kinder lernen im Schulhaus, auf dem Bauernhof, im Garten und im Wald.',
+      ),
+    },
+    {
+      blockType: 'textIntro' as const,
+      body: paragraphs(
+        'Die Kinder sammeln an der Natürlich Schule vielfältige Erfahrungen in allen Lebensbereichen.\nSie sollen als Erwachsene, gestärkt durch vernetztes Denken und Erfahrungen aus dem praktischen Leben, mit beiden Beinen auf dem Boden stehen. Sie sollen  sich als kompetent und selbstwirksam erleben dürfen.',
+        'Selbständigkeit  und Eigenverantwortung sind an der Natürlich Schule gross geschrieben und werden täglich gelebt.',
+        'Wir bieten den Kindern lustvolles Lernen an der Natürlich Schule - äusserlich und innerlich bewegt.',
+      ),
     },
     {
       blockType: 'ctaBanner' as const,
-      heading: 'Schule anschauen',
+      heading: 'Bleiben Fragen offen?',
       link: {
-        email: 'info@natuerlich-schule.ch',
-        label: 'Kontakt aufnehmen',
+        email: 'schulleitung@natuerlich-schule.ch',
+        label: 'schulleitung@natuerlich-schule.ch',
         type: 'email' as const,
       },
-      text: 'Besuchstage finden während des Semesters statt. Meldet euch, dann vereinbaren wir einen Termin.',
+      text: 'Melde dich unter:\nSchulleitung: Monika Ackermann',
+    },
+    {
+      blockType: 'textIntro' as const,
+      body: paragraphs('Team der Natürlich Schule:'),
     },
   ]
 }
@@ -436,7 +426,7 @@ export const seedHomepage = async (payload: Payload): Promise<void> => {
     layout: buildLayout({ posterId, videoId }),
     meta: {
       description:
-        'Kleine Privatschule im Berner Oberland. Unterricht im Schulhaus, im Stall, im Wald und im Garten. Bewilligt vom Kanton Bern.',
+        'Die Natürlich Schule versteht sich als Ergänzung zur Volksschule und ist eine vom Kanton Bern bewilligte Privatschule.',
       noIndex: false,
       title: 'Natürlich Schule — Privatschule in Unterbach, Kanton Bern',
     },

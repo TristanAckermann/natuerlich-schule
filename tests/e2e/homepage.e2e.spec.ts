@@ -16,8 +16,17 @@ import type { TextIntroBlock } from '../../src/payload-types'
 
 const BASE_URL = 'http://localhost:3000'
 
-/** Reihenfolge aus Spec 8 — die Blöcke tragen `data-block="<blockType>"`. */
-const BLOCK_ORDER = ['hero', 'textIntro', 'pillarCards', 'dayTimeline', 'quote', 'ctaBanner']
+/** Blockfolge der geseedeten Startseite — die Blöcke tragen `data-block="<blockType>"`. */
+const BLOCK_ORDER = [
+  'hero',
+  'quote',
+  'textIntro',
+  'textIntro',
+  'textIntro',
+  'textIntro',
+  'ctaBanner',
+  'textIntro',
+]
 
 const blockTypes = (page: Page): Promise<(string | null)[]> =>
   page
@@ -39,7 +48,7 @@ test.describe('Startseite', () => {
     await page.goto(BASE_URL)
   })
 
-  test('rendert alle sechs Blöcke in der Reihenfolge der Spec', async ({ page }) => {
+  test('rendert alle Blöcke in der Reihenfolge des Seeds', async ({ page }) => {
     const blocks = await blockTypes(page)
 
     test.skip(

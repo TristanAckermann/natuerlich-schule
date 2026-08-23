@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { CmsLink } from '@/components/CmsLink'
+import { CmsLink, resolveHref } from '@/components/CmsLink'
 import type { HeroBlock, Media } from '@/payload-types'
 
 import { HeroVideo } from './HeroVideo'
@@ -56,7 +56,12 @@ export const HeroComponent: React.FC<HeroBlock> = ({
         {teasers.map((teaser, index) => (
           <li className={styles.bandItem} key={teaser.id ?? index}>
             <p className={styles.bandText}>{teaser.text}</p>
-            {teaser.link ? (
+            {/*
+             * Nur ein Link, der auch irgendwohin führt. Teaser ohne Ziel sind
+             * blosse Bezeichnungen — ein totes „Mehr erfahren“ wäre Text, den
+             * niemand geschrieben hat.
+             */}
+            {teaser.link && resolveHref(teaser.link) ? (
               <CmsLink className={styles.bandLink} link={teaser.link} withArrow />
             ) : null}
           </li>

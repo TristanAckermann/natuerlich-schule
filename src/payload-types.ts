@@ -276,9 +276,9 @@ export interface LinkField {
  */
 export interface TextIntroBlock {
   /**
-   * Zeilenumbrüche werden übernommen — das Design bricht die Überschrift bewusst um.
+   * Zeilenumbrüche werden übernommen — das Design bricht die Überschrift bewusst um. Leer lassen für einen reinen Fliesstext-Abschnitt: der Text steht dann einspaltig und etwas grösser.
    */
-  heading: string;
+  heading?: string | null;
   body: {
     root: {
       type: string;

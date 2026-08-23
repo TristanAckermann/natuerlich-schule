@@ -21,11 +21,23 @@ const withLineBreaks = (value: string): React.ReactNode[] => {
   ))
 }
 
-export const TextIntroComponent: React.FC<TextIntroBlock> = ({ body, heading }) => (
-  <section className={styles.section} data-block="textIntro">
-    <div className={styles.inner}>
-      <h2 className={styles.heading}>{withLineBreaks(heading)}</h2>
-      <RichText className={styles.body} data={body} />
-    </div>
-  </section>
-)
+/**
+ * Ohne Überschrift wird aus dem Block ein reiner Fliesstext-Abschnitt: eine
+ * Spalte, etwas grössere Schrift, mehr Luft. So lassen sich längere Passagen
+ * in mehrere ruhige Abschnitte teilen, ohne dafür Zwischentitel zu erfinden.
+ */
+export const TextIntroComponent: React.FC<TextIntroBlock> = ({ body, heading }) => {
+  const hatUeberschrift = Boolean(heading && heading.trim())
+
+  return (
+    <section className={styles.section} data-block="textIntro">
+      <div className={hatUeberschrift ? styles.inner : styles.innerProse}>
+        {hatUeberschrift ? <h2 className={styles.heading}>{withLineBreaks(heading!)}</h2> : null}
+        <RichText
+          className={hatUeberschrift ? styles.body : `${styles.body} ${styles.bodyProse}`}
+          data={body}
+        />
+      </div>
+    </section>
+  )
+}
