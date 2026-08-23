@@ -3,22 +3,19 @@
 ## Ausgangslage
 
 Das Projekt wurde bereits aus dem offiziellen **Payload-Cloudflare-Template** erzeugt und
-liegt unter `natuerlichschulewebseite/`. Enthalten sind Payload 3.88, Next.js 16,
+liegt im Wurzelverzeichnis des Repositorys. Enthalten sind Payload 3.88, Next.js 16,
 D1-Adapter, R2-Plugin, OpenNext und eine Testeinrichtung (Vitest + Playwright).
 
-## Zu klären: Ablage im Repository
+## Ablage im Repository
 
-Der Payload-Ordner ist derzeit **nicht in Git** (`?? natuerlichschulewebseite/`), das
-Repository enthält nur diese Dokumentation. Bevor entwickelt wird, eine der beiden
-Varianten wählen:
+Entschieden: Die Anwendung liegt im **Repo-Wurzelverzeichnis** – `package.json`, `src/`
+und `wrangler.jsonc` oben, die Dokumentation in `docs/`. Es gibt nur eine Anwendung, und
+die übliche Cloudflare- und Payload-Werkzeugkette erwartet sie oben.
 
-| Variante | Ergebnis | Bewertung |
-|---|---|---|
-| **Anwendung ins Repo-Wurzelverzeichnis** | `package.json`, `src/`, `wrangler.jsonc` oben, Doku bleibt in `docs/` | **Empfohlen.** Es gibt nur eine Anwendung; die übliche Cloudflare- und Payload-Werkzeugkette erwartet sie oben. |
-| Anwendung als Unterordner `app/` | Repo enthält `app/` und `docs/` | Nur sinnvoll, wenn später eine zweite Anwendung dazukommt – danach sieht es nicht aus. |
-
-Was in beiden Fällen zu tun ist: `.gitignore` prüfen (`.next`, `.open-next`, `.wrangler`,
-`node_modules`, `.env`) und das Ganze als erster Commit erfassen.
+Auf der Platte liegt das Repository unter
+`Projects/natuerlich-schule/natuerlichschulewebseite/`; der übergeordnete Ordner ist
+reiner Arbeitsbereich und gehört nicht zum Repository. `.gitignore` deckt `.next`,
+`.open-next`, `.wrangler`, `node_modules` und `.env` ab.
 
 ## Zwei Punkte, die vor dem ersten Build zu beheben sind
 
