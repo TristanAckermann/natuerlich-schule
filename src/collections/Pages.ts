@@ -5,9 +5,11 @@ import { authenticated, authenticatedExceptHome, publishedOrAuthenticated } from
 import { CtaBanner } from '@/blocks/CtaBanner/config'
 import { DayTimeline } from '@/blocks/DayTimeline/config'
 import { Hero } from '@/blocks/Hero/config'
+import { PageHeader } from '@/blocks/PageHeader/config'
 import { PillarCards } from '@/blocks/PillarCards/config'
 import { Quote } from '@/blocks/Quote/config'
 import { TextIntro } from '@/blocks/TextIntro/config'
+import { Timetable } from '@/blocks/Timetable/config'
 import { slugField } from '@/fields/slug'
 import { revalidatePage, revalidatePageAfterDelete } from '@/hooks/revalidate'
 import { generatePreviewPath } from '@/utilities/generatePreviewPath'
@@ -42,7 +44,7 @@ export const Pages: CollectionConfig = {
     {
       name: 'layout',
       type: 'blocks',
-      blocks: [Hero, TextIntro, PillarCards, DayTimeline, Quote, CtaBanner],
+      blocks: [Hero, PageHeader, TextIntro, PillarCards, DayTimeline, Quote, CtaBanner, Timetable],
       label: 'Inhalt',
       minRows: 1,
       required: true,

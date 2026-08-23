@@ -35,12 +35,14 @@ Payload-Framework-Wissen kommt aus dem Skill `.claude/skills/payload/`, nicht au
 
 **Blocks** (`config.ts` + `Component.tsx` + `index.module.css` je Ordner)
 
-- `src/blocks/` — `Hero`, `TextIntro`, `PillarCards`, `DayTimeline`, `Quote`, `CtaBanner`
+- `src/blocks/` — `Hero`, `PageHeader`, `TextIntro`, `PillarCards`, `DayTimeline`, `Quote`,
+  `CtaBanner`, `Timetable` (zusätzlich `Timetable/grid.ts` — expandiert das Raster mit Zellverbund)
 - `src/blocks/RenderBlocks.tsx` — Registry für das Rendering
 
 ## Frontend
 
 - Startseite → `src/app/(frontend)/page.tsx`
+- Übrige Seiten → `src/app/(frontend)/[slug]/page.tsx`
 - Layout, Kopf- und Fusszeile → `src/app/(frontend)/layout.tsx`
 - Design-Tokens → `src/app/(frontend)/tokens.css`, Reset → `globals.css`
 - Vorschau-Handshake → `src/app/(frontend)/next/preview/route.ts`
@@ -71,6 +73,7 @@ Payload-Framework-Wissen kommt aus dem Skill `.claude/skills/payload/`, nicht au
 - D1-Adapter mit `push: false` in `src/payload.config.ts`
 - `wrangler.jsonc` — Bindings D1, R2 (Medien und Next-Cache)
 - `src/seed/homepage.ts` — idempotenter Seed für Startseite und Globals
+- `src/seed/stundenplaene.ts` — idempotenter Seed für die Seite „Stundenpläne"
 
 ## Tests
 

@@ -37,6 +37,16 @@ export const revalidatePage: CollectionAfterChangeHook = ({ context, doc, previo
     safeRevalidate(pageTag(previousDoc.slug))
   }
 
+  /*
+   * Kopf- und Fusszeile werden mit `depth: 1` geladen; ihr Cache-Eintrag
+   * enthält also den aufgelösten Slug jeder verlinkten Seite. Nach einer
+   * Umbenennung zeigte die Navigation sonst weiter auf die alte Adresse und
+   * liefe ins Leere, bis der Globals-Tag aus einem anderen Grund fällt.
+   */
+  if (typeof previousDoc?.slug === 'string' && previousDoc.slug !== doc?.slug) {
+    safeRevalidate(globalsTag)
+  }
+
   return doc
 }
 

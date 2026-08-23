@@ -14,16 +14,18 @@ Payload-Konfiguration, seine Darstellung und sein CSS mit.
 
 ## Daten
 
-Sechs Blocktypen, verwendet im Feld `layout` von `pages`:
+Acht Blocktypen, verwendet im Feld `layout` von `pages`:
 
 | Slug | Ordner | Zweck |
 | --- | --- | --- |
 | `hero` | `Hero/` | Kopfbereich, setzt die Akzentfarbe, optionales Video |
+| `pageHeader` | `PageHeader/` | Auftakt einer Unterseite, rendert das `h1` |
 | `textIntro` | `TextIntro/` | Einleitender Fliesstext |
 | `pillarCards` | `PillarCards/` | Karten mit den Schwerpunkten |
 | `dayTimeline` | `DayTimeline/` | Tagesablauf |
 | `quote` | `Quote/` | Zitat |
 | `ctaBanner` | `CtaBanner/` | Handlungsaufforderung mit Link |
+| `timetable` | `Timetable/` | Stundenplan als Tabelle mit Zellverbund und Legende |
 
 ## Frontend
 
@@ -53,4 +55,10 @@ Keiner eigener — Blöcke sind Felder von `pages` und folgen dessen Regeln.
 - Farben und Abstände kommen aus `src/app/(frontend)/tokens.css`. Kein Hex-Wert in einer
   Komponente.
 - Nur `Hero/HeroVideo.tsx` ist eine Client-Komponente; alles andere rendert auf dem Server.
+- Genau zwei Blöcke rendern ein `h1`: `hero` auf der Startseite und `pageHeader` auf allen
+  übrigen Seiten. Eine Seite braucht einen von beiden, sonst beginnt sie auf Ebene 2.
 - Links entstehen über `linkField()` und werden mit `CmsLink` gerendert.
+- `timetable` bildet HTML-Tabellensemantik ab: `colSpan` und `rowSpan` verbinden Zellen,
+  eine dadurch überdeckte Position wird in den Daten **nicht** erneut erfasst. Das Raster
+  expandiert `Timetable/grid.ts`; daraus entsteht auch die Kartenansicht pro Wochentag,
+  die unter 768px an die Stelle der Tabelle tritt.

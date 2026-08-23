@@ -1,0 +1,210 @@
+/*
+ * Block „timetable“ — Stundenplan als echte Tabelle, darunter dieselben Daten
+ * als Tageskarten für schmale Geräte. Farben und Linien ausschliesslich aus
+ * src/app/(frontend)/tokens.css.
+ */
+
+.section {
+  padding: var(--ns-section-y) var(--ns-gutter);
+  border-top: 1px solid var(--ns-hairline-faint);
+  border-bottom: 1px solid var(--ns-hairline-faint);
+  background: var(--ns-paper);
+}
+
+/*
+ * Einspaltig: eine Tabelle mit fünf Wochentagen braucht die volle Breite, das
+ * zweispaltige --ns-col-split des Tagesablaufs wäre hier zu eng.
+ */
+.inner {
+  max-width: var(--ns-content-max);
+}
+
+.heading {
+  margin-bottom: 28px;
+  font: var(--ns-type-h2-md);
+  letter-spacing: -0.015em;
+}
+
+/*
+ * Der Wrapper scrollt waagrecht, wenn die Tabelle breiter ist als der Platz.
+ * `tabindex` im Markup macht ihn per Tastatur erreichbar — der Fokusring wird
+ * deshalb bewusst nicht unterdrückt, sondern sichtbar gehalten.
+ */
+.scroller {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.scroller:focus-visible {
+  outline: 2px solid var(--ns-accent);
+  outline-offset: 3px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--ns-surface);
+  color: var(--ns-text-secondary);
+  font-size: 15px;
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+.table th,
+.table td {
+  padding: 10px 12px;
+  border: 1px solid var(--ns-hairline-faint);
+  vertical-align: top;
+  text-align: left;
+}
+
+/* Kopfzeile und Zeitspalte heben sich als Orientierungsrahmen ab. */
+.columnHead,
+.rowHead {
+  background: var(--ns-paper-alt);
+  color: var(--ns-ink);
+  font-weight: 500;
+}
+
+.columnHead {
+  border-bottom-color: var(--ns-hairline-soft);
+  white-space: nowrap;
+}
+
+.rowHead {
+  min-width: 104px;
+  border-right-color: var(--ns-hairline-soft);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Die leere Ecke oben links trägt keine Bedeutung und bleibt unbeschriftet. */
+.corner {
+  background: var(--ns-paper-alt);
+}
+
+.cell {
+  min-width: 132px;
+}
+
+/* Pausen treten zurück: gedämpfter Text auf ruhigem Grund, zentriert. */
+.cell[data-variant='pause'] {
+  background: var(--ns-paper-alt);
+  color: var(--ns-text-muted);
+  text-align: center;
+}
+
+/* Organisatorisches ist leicht abgesetzt, ohne die Lektionen zu übertönen. */
+.cell[data-variant='organisation'] {
+  background: var(--ns-mint);
+  color: var(--ns-text-tertiary);
+}
+
+/* Kartenansicht — oberhalb des Umbruchs wieder ausgeblendet. */
+.cards {
+  display: grid;
+  gap: 28px;
+}
+
+.dayHeading {
+  margin-bottom: 10px;
+  color: var(--ns-ink);
+  font-size: 19px;
+  font-weight: 500;
+}
+
+.dayRow {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  padding: 14px 0;
+  border-top: 1px solid var(--ns-hairline-soft);
+}
+
+.dayRow:last-child {
+  border-bottom: 1px solid var(--ns-hairline-soft);
+}
+
+.dayTime {
+  flex: none;
+  width: 96px;
+  color: var(--ns-text-tertiary);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.dayText {
+  min-width: 0;
+  color: var(--ns-text-secondary);
+  font-size: 16px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.dayText[data-variant='pause'] {
+  color: var(--ns-text-muted);
+}
+
+/* Wie in der Tabelle: Organisatorisches setzt sich von den Lektionen ab. */
+.dayText[data-variant='organisation'] {
+  color: var(--ns-text-tertiary);
+}
+
+/* Legende: Abkürzung und Bedeutung als zweispaltige Definitionsliste. */
+.legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 34px;
+  margin-top: 26px;
+  max-width: 720px;
+}
+
+.legendRow {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.legendTerm {
+  flex: none;
+  min-width: 44px;
+  color: var(--ns-ink);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.legendMeaning {
+  min-width: 0;
+  color: var(--ns-text-tertiary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/*
+ * Umbruch bei 768px statt bei den sonst üblichen 899/559px: fünf Tagesspalten
+ * plus Zeitspalte lassen sich darunter auch mit horizontalem Scrollen nicht
+ * mehr sinnvoll lesen, oberhalb dagegen schon.
+ */
+@media (max-width: 767px) {
+  .scroller {
+    display: none;
+  }
+
+  .cards {
+    display: grid;
+  }
+
+  .legend {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .cards {
+    display: none;
+  }
+}
