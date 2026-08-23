@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    pages: Page;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +79,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -87,8 +89,14 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    header: Header;
+    footer: Footer;
+  };
+  globalsSelect: {
+    header: HeaderSelect<false> | HeaderSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -148,7 +156,15 @@ export interface User {
  */
 export interface Media {
   id: number;
-  alt: string;
+  /**
+   * Was ist zu sehen? Pflicht für Bilder, für Videos nicht nötig.
+   */
+  alt?: string | null;
+  caption?: string | null;
+  /**
+   * Urheberin oder Quelle, falls ein Nachweis nötig ist.
+   */
+  credit?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -158,6 +174,208 @@ export interface Media {
   filesize?: number | null;
   width?: number | null;
   height?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  title: string;
+  /**
+   * Teil der URL. Leer lassen, um ihn aus dem Titel abzuleiten.
+   */
+  slug: string;
+  layout: (HeroBlock | TextIntroBlock | PillarCardsBlock | DayTimelineBlock | QuoteBlock | CtaBannerBlock)[];
+  meta?: {
+    /**
+     * Leer lassen, um den Seitentitel zu verwenden.
+     */
+    title?: string | null;
+    /**
+     * Höchstens 160 Zeichen.
+     */
+    description?: string | null;
+    image?: (number | null) | Media;
+    noIndex?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroBlock".
+ */
+export interface HeroBlock {
+  /**
+   * Kleine Zeile über dem Titel, üblicherweise Schultyp, Ort und Kanton.
+   */
+  kicker?: string | null;
+  heading: string;
+  /**
+   * Ein bis zwei Sätze. Wird auf 48 Zeichen Breite umbrochen.
+   */
+  lead?: string | null;
+  /**
+   * MP4 oder WebM, höchstens 3 MB. Läuft stumm und in Schleife.
+   */
+  video?: (number | null) | Media;
+  /**
+   * Standbild. Wird vor dem ersten Frame und bei reduzierter Bewegung gezeigt.
+   */
+  poster?: (number | null) | Media;
+  /**
+   * Sekunden Pause zwischen zwei Durchläufen.
+   */
+  loopPause?: number | null;
+  accent: 'sage' | 'fir' | 'graphite';
+  /**
+   * Dünne Fortschrittslinie unter dem Teaser-Band.
+   */
+  showProgress?: boolean | null;
+  /**
+   * Nach dem ersten Durchlauf wird das Video weichgezeichnet, der Text tritt hervor.
+   */
+  softenAfter?: boolean | null;
+  /**
+   * Genau drei Teaser. Je Teaser höchstens rund 30 Zeichen pro Zeile.
+   */
+  teasers?:
+    | {
+        text: string;
+        link: LinkField;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'hero';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LinkField".
+ */
+export interface LinkField {
+  type: 'internal' | 'external' | 'email';
+  /**
+   * Der sichtbare Linktext. Ohne Pfeil — den setzt das Layout.
+   */
+  label: string;
+  page?: (number | null) | Page;
+  /**
+   * Vollständige Adresse inklusive https://
+   */
+  url?: string | null;
+  email?: string | null;
+  newTab?: boolean | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TextIntroBlock".
+ */
+export interface TextIntroBlock {
+  /**
+   * Zeilenumbrüche werden übernommen — das Design bricht die Überschrift bewusst um.
+   */
+  heading: string;
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'textIntro';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PillarCardsBlock".
+ */
+export interface PillarCardsBlock {
+  /**
+   * Die Flächenfarbe ergibt sich aus der Position: 1. Karte Mint, 2. Karte Salbei, ab der 3. die Akzentfarbe.
+   */
+  cards?:
+    | {
+        /**
+         * Zweistellig, z. B. 01.
+         */
+        index: string;
+        /**
+         * Ein Wort, z. B. Hof.
+         */
+        category: string;
+        heading: string;
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'pillarCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DayTimelineBlock".
+ */
+export interface DayTimelineBlock {
+  heading: string;
+  entries?:
+    | {
+        /**
+         * Format HH:MM, z. B. 07:30.
+         */
+        time: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'dayTimeline';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "QuoteBlock".
+ */
+export interface QuoteBlock {
+  /**
+   * Ohne Anführungszeichen erfassen — die setzt das Layout.
+   */
+  quote: string;
+  /**
+   * Wer hat es gesagt, z. B. Schulleitung.
+   */
+  attribution?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'quote';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaBannerBlock".
+ */
+export interface CtaBannerBlock {
+  heading: string;
+  /**
+   * Kurzer Absatz, wird auf 52 Zeichen Breite umbrochen.
+   */
+  text?: string | null;
+  link: LinkField;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'ctaBanner';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -190,6 +408,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -261,6 +483,8 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  caption?: T;
+  credit?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -270,6 +494,135 @@ export interface MediaSelect<T extends boolean = true> {
   filesize?: T;
   width?: T;
   height?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  layout?:
+    | T
+    | {
+        hero?: T | HeroBlockSelect<T>;
+        textIntro?: T | TextIntroBlockSelect<T>;
+        pillarCards?: T | PillarCardsBlockSelect<T>;
+        dayTimeline?: T | DayTimelineBlockSelect<T>;
+        quote?: T | QuoteBlockSelect<T>;
+        ctaBanner?: T | CtaBannerBlockSelect<T>;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        noIndex?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroBlock_select".
+ */
+export interface HeroBlockSelect<T extends boolean = true> {
+  kicker?: T;
+  heading?: T;
+  lead?: T;
+  video?: T;
+  poster?: T;
+  loopPause?: T;
+  accent?: T;
+  showProgress?: T;
+  softenAfter?: T;
+  teasers?:
+    | T
+    | {
+        text?: T;
+        link?: T | LinkFieldSelect<T>;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LinkField_select".
+ */
+export interface LinkFieldSelect<T extends boolean = true> {
+  type?: T;
+  label?: T;
+  page?: T;
+  url?: T;
+  email?: T;
+  newTab?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TextIntroBlock_select".
+ */
+export interface TextIntroBlockSelect<T extends boolean = true> {
+  heading?: T;
+  body?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PillarCardsBlock_select".
+ */
+export interface PillarCardsBlockSelect<T extends boolean = true> {
+  cards?:
+    | T
+    | {
+        index?: T;
+        category?: T;
+        heading?: T;
+        text?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DayTimelineBlock_select".
+ */
+export interface DayTimelineBlockSelect<T extends boolean = true> {
+  heading?: T;
+  entries?:
+    | T
+    | {
+        time?: T;
+        description?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "QuoteBlock_select".
+ */
+export interface QuoteBlockSelect<T extends boolean = true> {
+  quote?: T;
+  attribution?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaBannerBlock_select".
+ */
+export interface CtaBannerBlockSelect<T extends boolean = true> {
+  heading?: T;
+  text?: T;
+  link?: T | LinkFieldSelect<T>;
+  id?: T;
+  blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -310,6 +663,181 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header".
+ */
+export interface Header {
+  id: number;
+  /**
+   * Name der Schule. Dient als Alternativtext des Logos und wird angezeigt, solange kein Logo hochgeladen ist.
+   */
+  wordmark: string;
+  /**
+   * Ohne Logo zeigt die Kopfzeile die Wortmarke als Text.
+   */
+  logo?: (number | null) | Media;
+  /**
+   * Beschriftung des Haus-Symbols links in der Navigation.
+   */
+  homeLabel: string;
+  /**
+   * Die Einträge der obersten Navigationszeile. Ein Klick klappt die Unterpunkte auf.
+   */
+  groups?:
+    | {
+        label: string;
+        items?:
+          | {
+              link: LinkField;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Inhalt des Menüs hinter dem Symbol mit den drei Strichen.
+   */
+  utilityLinks?:
+    | {
+        link: LinkField;
+        /**
+         * Hebt den Eintrag in der Akzentfarbe hervor.
+         */
+        highlight?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Blendet das Suchfeld rechts in der Navigation ein.
+   */
+  searchEnabled?: boolean | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer".
+ */
+export interface Footer {
+  id: number;
+  columns?:
+    | {
+        title: string;
+        /**
+         * Zeilenumbruch mit Umschalt + Enter.
+         */
+        body: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Strukturierte Angaben für Suchmaschinen (schema.org EducationalOrganization). Sie erscheinen nicht sichtbar auf der Seite.
+   */
+  organization: {
+    name: string;
+    streetAddress?: string | null;
+    postalCode?: string | null;
+    addressLocality?: string | null;
+    /**
+     * Kanton, z. B. BE.
+     */
+    addressRegion?: string | null;
+    email?: string | null;
+  };
+  /**
+   * Einzeilige Angabe ganz unten links.
+   */
+  legalNote?: string | null;
+  legalLinks?:
+    | {
+        link: LinkField;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header_select".
+ */
+export interface HeaderSelect<T extends boolean = true> {
+  wordmark?: T;
+  logo?: T;
+  homeLabel?: T;
+  groups?:
+    | T
+    | {
+        label?: T;
+        items?:
+          | T
+          | {
+              link?: T | LinkFieldSelect<T>;
+              id?: T;
+            };
+        id?: T;
+      };
+  utilityLinks?:
+    | T
+    | {
+        link?: T | LinkFieldSelect<T>;
+        highlight?: T;
+        id?: T;
+      };
+  searchEnabled?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  columns?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+        id?: T;
+      };
+  organization?:
+    | T
+    | {
+        name?: T;
+        streetAddress?: T;
+        postalCode?: T;
+        addressLocality?: T;
+        addressRegion?: T;
+        email?: T;
+      };
+  legalNote?: T;
+  legalLinks?:
+    | T
+    | {
+        link?: T | LinkFieldSelect<T>;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

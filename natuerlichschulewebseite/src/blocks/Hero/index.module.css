@@ -1,0 +1,321 @@
+/*
+ * Hero-Block — Layoutwerte aus docs/design/startseite-mockup.md, Abschnitt
+ * „Hero" und „Teaser-Band". Alle Farben stammen aus tokens.css; für die
+ * Scrim-Verläufe fehlt ein RGB-Tripel zu --ns-night, deshalb werden die
+ * Deckkraftstufen über color-mix() aus dem Token abgeleitet statt als Zahlen
+ * hingeschrieben.
+ *
+ * Die Datei wird von Component.tsx (Textteile) und HeroVideo.tsx (Hülle)
+ * gemeinsam importiert — nur so greifen die Zustandsselektoren der Hülle auf
+ * die serverseitig gerenderten Texte.
+ */
+
+.section {
+  /*
+   * Dauer eines Videodurchlaufs. HeroVideo.tsx überschreibt den Wert inline,
+   * sobald die Metadaten geladen sind; 14s ist der in Spec 7.1 vorgesehene
+   * Rückfallwert.
+   */
+  --ns-hero-pass: 14s;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: hidden;
+  background: var(--ns-night);
+}
+
+/* --- Hintergrundebene ---------------------------------------------------- */
+
+.media {
+  position: absolute;
+  inset: 0;
+}
+
+.poster,
+.video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video {
+  transition:
+    filter 1.4s ease,
+    transform 1.4s ease;
+}
+
+/* Ab dem zweiten Durchlauf wird das Video zur Textur, der Text tritt hervor. */
+.section[data-hero-state='soft'] .video {
+  filter: blur(7px) saturate(0.85) brightness(0.82);
+  transform: scale(1.06);
+}
+
+/*
+ * Zwei gestapelte Verläufe statt eines animierten `background`: Verläufe lassen
+ * sich nicht interpolieren, ein Überblenden zweier Ebenen dagegen schon.
+ */
+.scrim,
+.scrimSoft {
+  position: absolute;
+  display: block;
+  inset: 0;
+  pointer-events: none;
+}
+
+.scrim {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--ns-night) 34%, transparent) 0%,
+    color-mix(in srgb, var(--ns-night) 12%, transparent) 42%,
+    rgba(var(--ns-paper-rgb), 0.9) 72%,
+    var(--ns-paper) 88%
+  );
+}
+
+.scrimSoft {
+  opacity: 0;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--ns-night) 50%, transparent) 0%,
+    color-mix(in srgb, var(--ns-night) 40%, transparent) 44%,
+    rgba(var(--ns-paper-rgb), 0.9) 72%,
+    var(--ns-paper) 88%
+  );
+  transition: opacity 1.4s ease;
+}
+
+.section[data-hero-state='soft'] .scrimSoft {
+  opacity: 1;
+}
+
+/* --- Textbühne ----------------------------------------------------------- */
+
+/*
+ * Die Kopfzeile liegt im Layout absolut über dem Hero. Der obere Innenabstand
+ * hält die Navigation vom Kicker fern — mindestens 96px, darunter greift 5vh.
+ */
+.stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  padding: max(96px, 5vh) var(--ns-gutter) 3vh;
+}
+
+.copy {
+  width: 100%;
+  max-width: 1000px;
+}
+
+.kicker {
+  margin: 0 0 22px;
+  color: rgba(var(--ns-paper-rgb), 0.8);
+  font-size: 11.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  color: var(--ns-paper);
+  font: var(--ns-type-hero);
+  /* Spec 4.2: Untergrenze 48px, erst unter 560px auf 40px. */
+  font-size: clamp(48px, 7vw, 104px);
+  letter-spacing: -0.025em;
+}
+
+.lead {
+  margin: 30px 0 0;
+  max-width: 48ch;
+  color: var(--ns-on-dark);
+  font: var(--ns-type-lead);
+  text-wrap: pretty;
+}
+
+/* --- Teaser-Band --------------------------------------------------------- */
+
+.band {
+  position: relative;
+  z-index: 1;
+  padding: 0 var(--ns-gutter) 30px;
+}
+
+.bandGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 28px 60px;
+  max-width: var(--ns-content-max);
+}
+
+.bandItem {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.bandText {
+  margin: 0;
+  max-width: 30ch;
+  color: rgba(var(--ns-ink-rgb), 0.92);
+  font: 400 15px / 1.6 var(--ns-font);
+  text-wrap: pretty;
+}
+
+.bandLink {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(var(--ns-ink-rgb), 0.3);
+  color: var(--ns-fir);
+  font: 500 12.5px var(--ns-font);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.bandLink:hover {
+  border-bottom-color: rgba(var(--ns-ink-rgb), 0.55);
+  color: var(--ns-link-hover);
+}
+
+/* --- Fortschrittslinie --------------------------------------------------- */
+
+.progress {
+  position: relative;
+  height: 2px;
+  margin-top: 26px;
+  max-width: var(--ns-content-max);
+  background: rgba(var(--ns-ink-rgb), 0.16);
+}
+
+/*
+ * Läuft kein Video (reduzierte Bewegung, Sparmodus, kein JavaScript), entfällt
+ * die Linie. Sie wird nur unsichtbar geschaltet statt entfernt, damit der Platz
+ * reserviert bleibt und beim Zuschalten des Videos nichts springt.
+ */
+.section[data-hero-video='off'] .progress {
+  visibility: hidden;
+}
+
+.progressFill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  width: 0;
+  background: var(--ns-accent);
+  transition: width 0.25s linear;
+}
+
+/* --- Wipe-In ------------------------------------------------------------- */
+
+@keyframes wipeIn {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 -12% 0 0);
+  }
+}
+
+/*
+ * Startzustand ist „idle": alles sichtbar. Erst wenn der erste Durchlauf
+ * tatsächlich läuft, schaltet HeroVideo.tsx auf „armed" und die Texte fahren
+ * gestaffelt ein. Ohne JavaScript und vor der Hydration fehlt damit nichts.
+ * Die Verzögerungen sind Anteile der Videodauer, die Dauer ist der Rest des
+ * Durchlaufs (Spec 7.1).
+ */
+.section[data-hero-state='armed'] .kicker,
+.section[data-hero-state='armed'] .title,
+.section[data-hero-state='armed'] .lead,
+.section[data-hero-state='armed'] .bandText,
+.section[data-hero-state='armed'] .bandLink {
+  animation-name: wipeIn;
+  animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+.section[data-hero-state='armed'] .kicker {
+  animation-delay: calc(var(--ns-hero-pass) * 0.02);
+  animation-duration: calc(var(--ns-hero-pass) * 0.98);
+}
+
+.section[data-hero-state='armed'] .title {
+  animation-delay: calc(var(--ns-hero-pass) * 0.06);
+  animation-duration: calc(var(--ns-hero-pass) * 0.94);
+}
+
+.section[data-hero-state='armed'] .lead {
+  animation-delay: calc(var(--ns-hero-pass) * 0.12);
+  animation-duration: calc(var(--ns-hero-pass) * 0.88);
+}
+
+.section[data-hero-state='armed'] .bandText {
+  animation-delay: calc(var(--ns-hero-pass) * 0.2);
+  animation-duration: calc(var(--ns-hero-pass) * 0.8);
+}
+
+.section[data-hero-state='armed'] .bandLink {
+  animation-delay: calc(var(--ns-hero-pass) * 0.28);
+  animation-duration: calc(var(--ns-hero-pass) * 0.72);
+}
+
+/* --- Breakpoints (Spec 4.4) ---------------------------------------------- */
+
+/* Unter 1200px liegt das Teaser-Band zweispaltig. */
+@media (max-width: 1199px) {
+  .bandGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 26px 40px;
+  }
+}
+
+/* Unter 900px einspaltig — drei Spalten wären hier nur noch Wortsalat. */
+@media (max-width: 899px) {
+  .bandGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .bandText {
+    max-width: 46ch;
+  }
+}
+
+/* Unter 768px klappt die Kopfzeile zum Burger — sie braucht weniger Luft. */
+@media (max-width: 767px) {
+  .stage {
+    padding-top: max(80px, 5vh);
+    padding-bottom: 4vh;
+  }
+
+  .lead {
+    margin-top: 24px;
+  }
+}
+
+@media (max-width: 559px) {
+  .title {
+    font-size: clamp(40px, 7vw, 104px);
+  }
+
+  .kicker {
+    margin-bottom: 16px;
+  }
+
+  .band {
+    padding-bottom: 24px;
+  }
+}
