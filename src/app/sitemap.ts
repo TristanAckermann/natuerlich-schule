@@ -20,8 +20,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   })
 
-  return docs.map((page) => ({
-    lastModified: page.updatedAt ? new Date(page.updatedAt) : undefined,
-    url: page.slug === 'home' ? baseURL : `${baseURL}/${page.slug}`,
-  }))
+  return [
+    ...docs.map((page) => ({
+      lastModified: page.updatedAt ? new Date(page.updatedAt) : undefined,
+      url: page.slug === 'home' ? baseURL : `${baseURL}/${page.slug}`,
+    })),
+    // Feste Route ohne Seitendokument (src/app/(frontend)/events/page.tsx).
+    { url: `${baseURL}/events` },
+  ]
 }

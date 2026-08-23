@@ -1,0 +1,66 @@
+/*
+ * Seite „Events“ — Seitenkopf und Kartenraster.
+ * Abstände und Raster entsprechen dem Block `pageHeader` beziehungsweise
+ * `pillarCards`; die Karte selbst bringt ihre Gestaltung mit.
+ */
+
+.header {
+  padding: var(--ns-section-y) var(--ns-gutter) 0;
+  background: var(--ns-paper);
+}
+
+/* Wie im Block `pageHeader` ohne Lead: der Titel trägt den Auftakt allein. */
+.heading {
+  margin: 0;
+  max-width: var(--ns-content-max);
+  font: var(--ns-type-h2-lg);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.section {
+  padding: 44px var(--ns-gutter) var(--ns-section-y-wide);
+  background: var(--ns-paper);
+}
+
+/*
+ * `auto-fill` statt `auto-fit`: bei einem einzelnen Event soll die Karte ihre
+ * Spaltenbreite behalten und nicht über die ganze Seite laufen.
+ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 32px;
+  max-width: var(--ns-content-max);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Streckt die Karte auf die Zeilenhöhe, damit die Fusszeilen fluchten. */
+.item {
+  display: flex;
+  min-width: 0;
+}
+
+.empty {
+  max-width: var(--ns-content-max);
+  margin: 0;
+  padding: 44px 0;
+  border-top: 1px solid var(--ns-hairline-soft);
+  border-bottom: 1px solid var(--ns-hairline-soft);
+  color: var(--ns-text-secondary);
+  font: var(--ns-type-lead);
+  text-wrap: pretty;
+}
+
+@media (max-width: 559px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .section {
+    padding-top: 32px;
+  }
+}
