@@ -14,6 +14,7 @@ Payload-Framework-Wissen kommt aus dem Skill `.claude/skills/payload/`, nicht au
 - `users` → `src/collections/Users.ts` (Redaktionslogin, `auth: true`)
 - `media` → `src/collections/Media.ts` (Upload nach R2)
 - `pages` → `src/collections/Pages.ts` (Blocks, Entwürfe, SEO)
+- `events` → `src/collections/Events.ts` (Anlässe, Entwürfe, Bild aus `media`)
 
 **Globals**
 
@@ -26,7 +27,7 @@ Payload-Framework-Wissen kommt aus dem Skill `.claude/skills/payload/`, nicht au
 
 **Hooks**
 
-- `src/hooks/revalidate.ts` — Cache-Tags `pages:<slug>` und `globals`, Invalidierung nach dem Speichern
+- `src/hooks/revalidate.ts` — Cache-Tags `pages:<slug>`, `globals` und `events`, Invalidierung nach dem Speichern
 
 **Wiederverwendbare Felder**
 
@@ -43,6 +44,7 @@ Payload-Framework-Wissen kommt aus dem Skill `.claude/skills/payload/`, nicht au
 
 - Startseite → `src/app/(frontend)/page.tsx`
 - Übrige Seiten → `src/app/(frontend)/[slug]/page.tsx`
+- Events → `src/app/(frontend)/events/page.tsx` (feste Route, kein Seitendokument)
 - Layout, Kopf- und Fusszeile → `src/app/(frontend)/layout.tsx`
 - Design-Tokens → `src/app/(frontend)/tokens.css`, Reset → `globals.css`
 - Vorschau-Handshake → `src/app/(frontend)/next/preview/route.ts`
@@ -53,11 +55,12 @@ Payload-Framework-Wissen kommt aus dem Skill `.claude/skills/payload/`, nicht au
 
 - `src/components/SiteHeader/` (inkl. `Nav.client.tsx`), `src/components/SiteFooter/`
 - `src/components/CmsLink.tsx` — löst `linkField()` in eine URL auf
+- `src/components/EventCard/` — Eventkarte mit Datumsfeld
 - `src/components/RichText.tsx`, `src/components/OrganizationJsonLd.tsx`
 
 **Datenzugriff**
 
-- `src/utilities/getPage.ts`, `getGlobals.ts` — Local API mit Cache-Tag
+- `src/utilities/getPage.ts`, `getGlobals.ts`, `getEvents.ts` — Local API mit Cache-Tag
 - `src/utilities/generateMeta.ts`, `generatePreviewPath.ts`, `getURL.ts`, `slugify.ts`
 
 ## Authentifizierung

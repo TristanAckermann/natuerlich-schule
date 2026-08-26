@@ -5,6 +5,8 @@ import { revalidateTag } from 'next/cache'
 export const pageTag = (slug: string) => `pages:${slug}`
 /** Cache-Tag für Header und Footer zusammen. */
 export const globalsTag = 'globals'
+/** Cache-Tag der Eventliste. */
+export const eventsTag = 'events'
 
 const safeRevalidate = (tag: string) => {
   try {
@@ -59,5 +61,22 @@ export const revalidatePageAfterDelete: CollectionAfterDeleteHook = ({ context, 
 export const revalidateGlobals: GlobalAfterChangeHook = ({ context, doc }) => {
   if (context?.disableRevalidate) return doc
   safeRevalidate(globalsTag)
+  return doc
+}
+
+/**
+ * Die Eventliste hängt an einem einzigen Tag: jede Änderung — neu, bearbeitet,
+ * veröffentlicht oder zurück auf Entwurf — verschiebt die Reihenfolge oder die
+ * Sichtbarkeit und muss die ganze Liste neu aufbauen.
+ */
+export const revalidateEvents: CollectionAfterChangeHook = ({ context, doc }) => {
+  if (context?.disableRevalidate) return doc
+  safeRevalidate(eventsTag)
+  return doc
+}
+
+export const revalidateEventsAfterDelete: CollectionAfterDeleteHook = ({ context, doc }) => {
+  if (context?.disableRevalidate) return doc
+  safeRevalidate(eventsTag)
   return doc
 }
