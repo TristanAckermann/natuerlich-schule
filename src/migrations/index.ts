@@ -3,6 +3,7 @@ import * as migration_20260823_123349_startseite from './20260823_123349_startse
 import * as migration_20260823_160511_stundenplan from './20260823_160511_stundenplan';
 import * as migration_20260823_163433_seitenkopf from './20260823_163433_seitenkopf';
 import * as migration_20260823_165157_events from './20260823_165157_events';
+import * as migration_20260826_183205_ferienplan from './20260826_183205_ferienplan';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20260823_165157_events.up,
     down: migration_20260823_165157_events.down,
-    name: '20260823_165157_events'
+    name: '20260823_165157_events',
+  },
+  {
+    up: migration_20260826_183205_ferienplan.up,
+    down: migration_20260826_183205_ferienplan.down,
+    name: '20260826_183205_ferienplan'
   },
 ];

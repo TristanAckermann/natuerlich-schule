@@ -14,7 +14,7 @@ Payload-Konfiguration, seine Darstellung und sein CSS mit.
 
 ## Daten
 
-Acht Blocktypen, verwendet im Feld `layout` von `pages`:
+Neun Blocktypen, verwendet im Feld `layout` von `pages`:
 
 | Slug | Ordner | Zweck |
 | --- | --- | --- |
@@ -26,6 +26,7 @@ Acht Blocktypen, verwendet im Feld `layout` von `pages`:
 | `quote` | `Quote/` | Zitat |
 | `ctaBanner` | `CtaBanner/` | Handlungsaufforderung mit Link |
 | `timetable` | `Timetable/` | Stundenplan als Tabelle mit Zellverbund und Legende |
+| `holidayPlan` | `HolidayPlan/` | Schulferien je Schuljahr, mit Hervorhebung der laufenden Ferien |
 
 ## Frontend
 
@@ -54,7 +55,8 @@ Keiner eigener — Blöcke sind Felder von `pages` und folgen dessen Regeln.
 
 - Farben und Abstände kommen aus `src/app/(frontend)/tokens.css`. Kein Hex-Wert in einer
   Komponente.
-- Nur `Hero/HeroVideo.tsx` ist eine Client-Komponente; alles andere rendert auf dem Server.
+- Client-Komponenten gibt es nur zwei: `Hero/HeroVideo.tsx` und die Hervorhebung in
+  `HolidayPlan/`; alles andere rendert auf dem Server.
 - Genau zwei Blöcke rendern ein `h1`: `hero` auf der Startseite und `pageHeader` auf allen
   übrigen Seiten. Eine Seite braucht einen von beiden, sonst beginnt sie auf Ebene 2.
 - Links entstehen über `linkField()` und werden mit `CmsLink` gerendert.
@@ -62,3 +64,12 @@ Keiner eigener — Blöcke sind Felder von `pages` und folgen dessen Regeln.
   eine dadurch überdeckte Position wird in den Daten **nicht** erneut erfasst. Das Raster
   expandiert `Timetable/grid.ts`; daraus entsteht auch die Kartenansicht pro Wochentag,
   die unter 768px an die Stelle der Tabelle tritt.
+- `holidayPlan` speichert Tagesdaten. Payload normalisiert `pickerAppearance: 'dayOnly'` auf
+  12:00 UTC, deshalb formatiert die Komponente zwingend mit `timeZone: 'UTC'` — sonst wird
+  aus dem 19. September in einer westlichen Zeitzone der 18.
+- Welche Ferien gerade laufen, entscheidet sich **im Browser**, nicht auf dem Server. Die
+  Seiten sind mit `revalidate = false` gecacht und werden nur über `revalidateTag` neu
+  gebaut; ein serverseitig aus `new Date()` abgeleiteter Zustand fror auf dem Zeitpunkt des
+  letzten Builds ein. Der Server rendert die Liste deshalb neutral und vollständig, die
+  Client-Komponente ergänzt nach der Hydration nur die Hervorhebung. Ohne JavaScript fehlt
+  genau diese und sonst nichts.
