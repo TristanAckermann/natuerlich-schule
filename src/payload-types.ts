@@ -197,6 +197,7 @@ export interface Page {
     | QuoteBlock
     | CtaBannerBlock
     | TimetableBlock
+    | HolidayPlanBlock
   )[];
   meta?: {
     /**
@@ -459,6 +460,43 @@ export interface TimetableBlock {
   blockType: 'timetable';
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HolidayPlanBlock".
+ */
+export interface HolidayPlanBlock {
+  heading: string;
+  years?:
+    | {
+        /**
+         * Beispiel: Schulferien 2026 – 27.
+         */
+        label: string;
+        entries?:
+          | {
+              /**
+               * Beispiel: Herbstferien.
+               */
+              name: string;
+              from: string;
+              /**
+               * Leer lassen für einen einzelnen freien Tag.
+               */
+              to?: string | null;
+              /**
+               * Kurzer Hinweis in Klammern, z. B. „7 Wochen“.
+               */
+              note?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'holidayPlan';
+}
+/**
  * Veröffentlichte Events erscheinen automatisch auf der Seite „Events“, nach Datum sortiert.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -631,6 +669,7 @@ export interface PagesSelect<T extends boolean = true> {
         quote?: T | QuoteBlockSelect<T>;
         ctaBanner?: T | CtaBannerBlockSelect<T>;
         timetable?: T | TimetableBlockSelect<T>;
+        holidayPlan?: T | HolidayPlanBlockSelect<T>;
       };
   meta?:
     | T
@@ -786,6 +825,30 @@ export interface TimetableBlockSelect<T extends boolean = true> {
     | {
         abbreviation?: T;
         meaning?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HolidayPlanBlock_select".
+ */
+export interface HolidayPlanBlockSelect<T extends boolean = true> {
+  heading?: T;
+  years?:
+    | T
+    | {
+        label?: T;
+        entries?:
+          | T
+          | {
+              name?: T;
+              from?: T;
+              to?: T;
+              note?: T;
+              id?: T;
+            };
         id?: T;
       };
   id?: T;

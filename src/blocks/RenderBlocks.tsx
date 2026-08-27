@@ -5,6 +5,7 @@ import type { Page } from '@/payload-types'
 import { CtaBannerComponent } from './CtaBanner/Component'
 import { DayTimelineComponent } from './DayTimeline/Component'
 import { HeroComponent } from './Hero/Component'
+import { HolidayPlanComponent } from './HolidayPlan/Component'
 import { PageHeaderComponent } from './PageHeader/Component'
 import { PillarCardsComponent } from './PillarCards/Component'
 import { QuoteComponent } from './Quote/Component'
@@ -17,6 +18,7 @@ const blockComponents = {
   ctaBanner: CtaBannerComponent,
   dayTimeline: DayTimelineComponent,
   hero: HeroComponent,
+  holidayPlan: HolidayPlanComponent,
   pageHeader: PageHeaderComponent,
   pillarCards: PillarCardsComponent,
   quote: QuoteComponent,

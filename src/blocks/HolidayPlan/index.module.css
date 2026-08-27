@@ -1,0 +1,150 @@
+/*
+ * Block „holidayPlan“ — Ferienplan, je Schuljahr eine Karte mit einer
+ * Zuordnungsliste aus Ferienname und Zeitraum. Farben, Linien und Typografie
+ * ausschliesslich aus src/app/(frontend)/tokens.css.
+ */
+
+.section {
+  padding: var(--ns-section-y) var(--ns-gutter);
+  border-top: 1px solid var(--ns-hairline-faint);
+  border-bottom: 1px solid var(--ns-hairline-faint);
+  background: var(--ns-paper);
+}
+
+.inner {
+  max-width: var(--ns-content-max);
+}
+
+.heading {
+  margin-bottom: 28px;
+  font: var(--ns-type-h2-md);
+  letter-spacing: -0.015em;
+}
+
+/*
+ * `min(340px, 100%)` statt schlicht `340px`: unterhalb von 340 px Spaltenbreite
+ * würde die feste Mindestbreite die Karte über den Bildschirm hinausschieben
+ * und die Seite waagrecht scrollbar machen.
+ */
+.years {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+  gap: 28px;
+}
+
+.year {
+  padding: 26px 28px 28px;
+  border: 1px solid var(--ns-hairline-faint);
+  background: var(--ns-surface);
+}
+
+.yearHeading {
+  margin-bottom: 6px;
+  color: var(--ns-ink);
+  font-size: 19px;
+  font-weight: 500;
+}
+
+.list {
+  margin-top: 12px;
+}
+
+/*
+ * Zeilen wie im Stundenplan durch Haarlinien getrennt. Die linke Kante liegt
+ * immer an, nur eben durchsichtig — so verschiebt die Hervorhebung nach der
+ * Hydration kein Layout.
+ */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 18px;
+  padding: 13px 0 13px 14px;
+  border-top: 1px solid var(--ns-hairline-soft);
+  border-left: 3px solid transparent;
+}
+
+.row:last-child {
+  border-bottom: 1px solid var(--ns-hairline-soft);
+}
+
+.name {
+  flex: none;
+  width: 124px;
+  color: var(--ns-ink);
+  font-weight: 500;
+  font-size: 15px;
+}
+
+/*
+ * `flex-basis` statt `flex: 1`: reicht der Platz neben dem Namen nicht mehr für
+ * einen Zeitraum über den Jahreswechsel, rutscht die Angabe als Ganzes in die
+ * nächste Zeile, statt mitten im Datum umzubrechen.
+ */
+.period {
+  flex: 1 1 190px;
+  min-width: 0;
+  color: var(--ns-text-tertiary);
+  font-size: 15px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/*
+ * Der Zusatz tritt zurück, bleibt aber lesbar: --ns-text-muted käme auf dieser
+ * Fläche nur auf 3.3:1 und fiele bei dieser Grösse durch WCAG AA.
+ */
+.note {
+  color: var(--ns-text-tertiary);
+  font-size: 13.5px;
+}
+
+/*
+ * Beschriftung der Hervorhebung („läuft“ / „als Nächstes“). Reines Salbei wäre
+ * bei dieser Grösse zu schwach; 40 % Akzent auf Fliesstextfarbe behält den
+ * Grünton und trägt den Kontrast — dasselbe Vorgehen wie im Kicker der
+ * Säulenkarten.
+ */
+.flag {
+  margin-left: 10px;
+  color: color-mix(in srgb, var(--ns-accent) 40%, var(--ns-ink));
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+/*
+ * Zustände setzt HolidayHighlight.client.tsx nach der Hydration. Ohne
+ * JavaScript bleibt die Liste vollständig, nur ohne Hervorhebung.
+ */
+.row[data-state='current'],
+.row[data-state='next'] {
+  border-left-color: var(--ns-accent);
+  background: var(--ns-paper-alt);
+}
+
+/*
+ * Vergangenes tritt zurück, ohne unter die Lesbarkeitsschwelle zu fallen: der
+ * Name verliert die Auszeichnung und rückt auf die Farbe des Zeitraums.
+ */
+.row[data-state='past'] .name {
+  color: var(--ns-text-tertiary);
+  font-weight: 400;
+}
+
+@media (max-width: 559px) {
+  /* Auf schmalen Geräten steht der Zeitraum unter dem Namen. */
+  .name {
+    width: 100%;
+  }
+
+  .period {
+    flex: 1 1 100%;
+  }
+
+  .year {
+    padding: 22px 20px 24px;
+  }
+}

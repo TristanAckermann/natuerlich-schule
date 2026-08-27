@@ -73,6 +73,21 @@ const dayTimelineBlock = (time: string): Page['layout'][number] => ({
   heading: 'Ein Tag bei uns',
 })
 
+/** Ferienplan mit genau einem Eintrag — geprüft wird immer dessen `to`. */
+const holidayPlanBlock = (entry: {
+  from: string
+  to?: null | string
+}): Page['layout'][number] => ({
+  blockType: 'holidayPlan',
+  heading: 'Schulferien',
+  years: [
+    {
+      entries: [{ name: 'Herbstferien', ...entry }],
+      label: 'Schulferien 2026 – 27',
+    },
+  ],
+})
+
 /** Minimaler, gültiger Lexical-Baum mit einem Absatz. */
 const richText = (text: string): TextIntroBlock['body'] => ({
   root: {
@@ -280,6 +295,79 @@ describe('Blöcke', () => {
 
     it.each(ungueltig)('weist %s ab', async (time) => {
       await expect(createPage([dayTimelineBlock(time)], 'zeit-kaputt')).rejects.toThrow()
+    })
+  })
+
+  describe('holidayPlan.years[].entries[].to', () => {
+    /* Tagesdaten so, wie Payload sie bei `dayOnly` speichert: 12:00 UTC. */
+    const ERSTER_TAG = '2026-09-19T12:00:00.000Z'
+    const TAG_DAVOR = '2026-09-18T12:00:00.000Z'
+
+    /*
+     * Die Meldung eines Feldvalidators steckt nicht in `error.message` — dort
+     * steht nur die Liste der betroffenen Felder —, sondern in `data.errors`.
+     */
+    const validationMessages = async (page: Promise<Page>): Promise<string[]> => {
+      try {
+        await page
+      } catch (error) {
+        const { data } = error as { data?: { errors?: { message?: string }[] } }
+        return data?.errors?.map((fieldError) => fieldError.message ?? '') ?? []
+      }
+      return []
+    }
+
+    it('nimmt einen leeren letzten Tag an', async () => {
+      const doc = await createPage([holidayPlanBlock({ from: ERSTER_TAG })], 'ferien-ein-tag')
+      const block = doc.layout[0]
+
+      expect(block.blockType === 'holidayPlan' && block.years?.[0]?.entries?.[0]?.to).toBeFalsy()
+    })
+
+    it('nimmt einen letzten Tag gleich dem ersten Tag an', async () => {
+      const doc = await createPage(
+        [holidayPlanBlock({ from: ERSTER_TAG, to: ERSTER_TAG })],
+        'ferien-gleicher-tag',
+      )
+      const block = doc.layout[0]
+
+      expect(block.blockType === 'holidayPlan' && block.years?.[0]?.entries?.[0]?.to).toBe(
+        ERSTER_TAG,
+      )
+    })
+
+    it('nimmt einen Zeitraum über den Jahreswechsel an', async () => {
+      const doc = await createPage(
+        [holidayPlanBlock({ from: '2026-12-24T12:00:00.000Z', to: '2027-01-10T12:00:00.000Z' })],
+        'ferien-jahreswechsel',
+      )
+      const block = doc.layout[0]
+
+      expect(block.blockType === 'holidayPlan' && block.years?.[0]?.entries?.[0]?.to).toBe(
+        '2027-01-10T12:00:00.000Z',
+      )
+    })
+
+    it('weist einen letzten Tag vor dem ersten Tag ab', async () => {
+      const page = createPage(
+        [holidayPlanBlock({ from: ERSTER_TAG, to: TAG_DAVOR })],
+        'ferien-rueckwaerts',
+      )
+
+      await expect(validationMessages(page)).resolves.toContain(
+        'Der letzte Tag darf nicht vor dem ersten Tag liegen.',
+      )
+    })
+
+    it('weist einen unlesbaren letzten Tag ab', async () => {
+      const page = createPage(
+        [holidayPlanBlock({ from: ERSTER_TAG, to: 'übermorgen' })],
+        'ferien-kaputt',
+      )
+
+      await expect(validationMessages(page)).resolves.toContain(
+        'Bitte ein gültiges Datum angeben.',
+      )
     })
   })
 })
