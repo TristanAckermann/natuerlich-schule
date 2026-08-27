@@ -288,6 +288,10 @@ export interface LinkField {
  */
 export interface PageHeaderBlock {
   /**
+   * Optionales, rein dekoratives Symbol über dem Titel — zum Beispiel das Signet der Schule. Es wird ohne Alternativtext ausgegeben, weil der Titel direkt darunter steht; für ein Bild mit eigener Aussage ist dieses Feld nicht gedacht. Ohne Bild beginnt die Seite direkt mit dem Titel.
+   */
+  icon?: (number | null) | Media;
+  /**
    * Der Titel der Seite. Zeilenumbrüche werden übernommen — das Design bricht die Überschrift bewusst um.
    */
   heading: string;
@@ -724,6 +728,7 @@ export interface LinkFieldSelect<T extends boolean = true> {
  * via the `definition` "PageHeaderBlock_select".
  */
 export interface PageHeaderBlockSelect<T extends boolean = true> {
+  icon?: T;
   heading?: T;
   lead?: T;
   id?: T;

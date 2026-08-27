@@ -4,6 +4,7 @@ import * as migration_20260823_160511_stundenplan from './20260823_160511_stunde
 import * as migration_20260823_163433_seitenkopf from './20260823_163433_seitenkopf';
 import * as migration_20260823_165157_events from './20260823_165157_events';
 import * as migration_20260826_183205_ferienplan from './20260826_183205_ferienplan';
+import * as migration_20260827_114724_unterstufe from './20260827_114724_unterstufe';
 
 export const migrations = [
   {
@@ -34,6 +35,11 @@ export const migrations = [
   {
     up: migration_20260826_183205_ferienplan.up,
     down: migration_20260826_183205_ferienplan.down,
-    name: '20260826_183205_ferienplan'
+    name: '20260826_183205_ferienplan',
+  },
+  {
+    up: migration_20260827_114724_unterstufe.up,
+    down: migration_20260827_114724_unterstufe.down,
+    name: '20260827_114724_unterstufe'
   },
 ];

@@ -27,7 +27,14 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Payload } from 'payload'
 
-import type { TextIntroBlock } from '@/payload-types'
+import {
+  type LexicalNode,
+  type RichTextValue,
+  paragraphNode,
+  paragraphs,
+  rootNode,
+  textNode,
+} from './lexical'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -45,64 +52,6 @@ const SEED_CONTEXT = { disableRevalidate: true }
  * Bewusst konstant, damit zwei Seed-Läufe denselben Baum erzeugen.
  */
 const KONTAKT_LINK_ID = '000000000000000000000001'
-
-// ---------------------------------------------------------------------------
-// Lexical-Hilfsfunktionen
-// ---------------------------------------------------------------------------
-
-/** Der Typ ist für alle richText-Felder im Projekt derselbe. */
-type RichTextValue = TextIntroBlock['body']
-
-/** Ein beliebiger Lexical-Knoten. Mehr Struktur braucht der Seed nicht. */
-type LexicalNode = { type: string; version: number; [key: string]: unknown }
-
-const textNode = (text: string): LexicalNode => ({
-  detail: 0,
-  format: 0,
-  mode: 'normal',
-  style: '',
-  text,
-  type: 'text',
-  version: 1,
-})
-
-const linebreakNode = (): LexicalNode => ({ type: 'linebreak', version: 1 })
-
-/** Wandelt `\n` innerhalb eines Absatzes in Lexical-Zeilenumbrüche um. */
-const inlineChildren = (text: string): LexicalNode[] =>
-  text
-    .split('\n')
-    .flatMap((zeile, index) =>
-      index === 0 ? [textNode(zeile)] : [linebreakNode(), textNode(zeile)],
-    )
-
-const paragraphNode = (children: LexicalNode[]): LexicalNode => ({
-  children,
-  direction: 'ltr',
-  format: '',
-  indent: 0,
-  textFormat: 0,
-  type: 'paragraph',
-  version: 1,
-})
-
-const rootNode = (children: LexicalNode[]): RichTextValue => ({
-  root: {
-    children,
-    direction: 'ltr',
-    format: '',
-    indent: 0,
-    type: 'root',
-    version: 1,
-  },
-})
-
-/**
- * Baut einen Lexical-Baum aus einfachen Absätzen. Jedes Argument ist ein Absatz,
- * ein `\n` darin wird zum Zeilenumbruch.
- */
-const paragraphs = (...texte: string[]): RichTextValue =>
-  rootNode(texte.map((text) => paragraphNode(inlineChildren(text))))
 
 /** Ein einzelner Absatz, der nur aus einem `mailto:`-Link besteht. */
 const mailtoParagraph = (email: string): RichTextValue => {
@@ -345,10 +294,39 @@ const WEITERE_LINKS = [
   { highlight: true, label: 'Insiderbereich' },
 ]
 
+/**
+ * Liest die bereits verknüpften Ziele der Kopfzeile, nach Linktext abgelegt.
+ *
+ * Die Navigation entsteht hier aus einer festen Liste, die nur Linktexte kennt.
+ * Die Ziele tragen die Seiten-Seeds nach (`src/seed/navigation.ts`) — würde
+ * `seedHeader` die Gruppen einfach neu schreiben, wären sie danach wieder weg
+ * und jede Unterseite nur noch über ihre URL erreichbar. Das trifft nicht nur
+ * einen vollständigen Seed-Lauf, sondern jeden Aufruf von `seedHomepage` allein,
+ * etwa aus `tests/int/pages.int.spec.ts`.
+ */
+const bestehendeZiele = async (payload: Payload): Promise<Map<string, number>> => {
+  const header = await payload.findGlobal({ slug: 'header', depth: 0 })
+  const ziele = new Map<string, number>()
+
+  for (const gruppe of header.groups ?? []) {
+    for (const item of gruppe.items ?? []) {
+      const seite = item.link.page
+      // Bei `depth: 0` ist ein gesetztes Ziel immer die ID.
+      if (typeof seite === 'number') ziele.set(item.link.label, seite)
+    }
+  }
+
+  return ziele
+}
+
 const seedHeader = async (payload: Payload, logoId: number | null): Promise<void> => {
+  const ziele = await bestehendeZiele(payload)
+
   const headerData = {
     groups: NAVIGATION.map((gruppe) => ({
-      items: gruppe.items.map((label) => ({ link: offenerLink(label) })),
+      items: gruppe.items.map((label) => ({
+        link: { ...offenerLink(label), page: ziele.get(label) ?? null },
+      })),
       label: gruppe.label,
     })),
     homeLabel: 'Home',

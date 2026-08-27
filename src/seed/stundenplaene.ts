@@ -19,6 +19,8 @@ import type { Payload } from 'payload'
 
 import type { Page } from '@/payload-types'
 
+import { verknuepfeNavigation } from './navigation'
+
 /** Slug der Seite. */
 const STUNDENPLAENE_SLUG = 'stundenplaene'
 
@@ -292,49 +294,6 @@ const LAYOUT: Page['layout'] = [
 ]
 
 // ---------------------------------------------------------------------------
-// Navigation
-// ---------------------------------------------------------------------------
-
-/**
- * Hängt die neue Seite an den bestehenden Navigationseintrag „Stundenplan".
- *
- * Das passiert hier und nicht in `homepage.ts`: `seedHomepage` befüllt die
- * Kopfzeile, bevor diese Seite existiert — die Verknüpfung braucht deren ID und
- * ist deshalb ein Nachtrag. Idempotent bleibt es, weil bei jedem Lauf derselbe
- * Eintrag gefunden und auf dieselbe ID gesetzt wird. Der Linktext bleibt
- * unverändert „Stundenplan", so steht er in der Navigation der Schule.
- *
- * Fehlt der Eintrag, wird nur gewarnt — der Seed bricht deswegen nie ab.
- */
-const verknuepfeNavigation = async (payload: Payload, seitenId: number): Promise<void> => {
-  const header = await payload.findGlobal({ slug: 'header', depth: 0 })
-  const gruppen = header.groups ?? []
-
-  const eintrag = gruppen
-    .flatMap((gruppe) => gruppe.items ?? [])
-    .find((item) => item.link.label === NAVIGATIONS_LABEL)
-
-  if (!eintrag) {
-    payload.logger.warn(
-      `Seed: Navigationseintrag „${NAVIGATIONS_LABEL}" nicht gefunden — die Seite ` +
-        '„Stundenpläne" bleibt unverlinkt. Zuerst den Seed der Startseite ausführen.',
-    )
-    return
-  }
-
-  eintrag.link.page = seitenId
-
-  await payload.updateGlobal({
-    slug: 'header',
-    context: SEED_CONTEXT,
-    data: { groups: gruppen },
-    depth: 0,
-  })
-
-  payload.logger.info(`Seed: Navigationseintrag „${NAVIGATIONS_LABEL}" verknüpft.`)
-}
-
-// ---------------------------------------------------------------------------
 // Einstieg
 // ---------------------------------------------------------------------------
 
@@ -389,5 +348,5 @@ export const seedStundenplaene = async (payload: Payload): Promise<void> => {
     payload.logger.info(`Seed: Seite „Stundenpläne" angelegt (ID ${seitenId}).`)
   }
 
-  await verknuepfeNavigation(payload, seitenId)
+  await verknuepfeNavigation(payload, { label: NAVIGATIONS_LABEL, seite: 'Stundenpläne', seitenId })
 }

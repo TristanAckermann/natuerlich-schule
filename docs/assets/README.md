@@ -6,7 +6,7 @@ Warnung und läuft weiter — die Startseite bleibt funktionsfähig.
 
 | Datei                          | Verwendung                       | Status                    |
 | ------------------------------ | -------------------------------- | ------------------------- |
-| `logo-natuerlich-schule.png`   | Logo in der Kopfzeile            | fehlt — manuell exportieren |
+| `logo-natuerlich-schule.png`   | Logo in der Kopfzeile, Symbol im Seitenkopf der Unterstufe | fehlt — manuell exportieren |
 | `hero-loop.mp4`                | Hintergrundvideo im Hero         | vorhanden                 |
 | `hero-poster.jpg`              | Standbild und Rückfall zum Video | vorhanden                 |
 

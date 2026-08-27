@@ -73,6 +73,12 @@
   /* Typografie */
   --ns-font: var(--font-rethink-sans), system-ui, sans-serif;
   --ns-type-hero: 500 clamp(40px, 7vw, 104px) / 0.98 var(--ns-font);
+  /*
+   * Der Seitentitel einer Unterseite. Eine Stufe über --ns-type-h2-lg, damit er
+   * sich von den Abschnittstiteln abhebt — auf einer Seite mit vielen
+   * Abschnitten läge er sonst auf derselben Ebene wie jeder Zwischentitel.
+   */
+  --ns-type-h1-page: 400 clamp(34px, 4.4vw, 60px) / 1.05 var(--ns-font);
   --ns-type-h2-lg: 400 clamp(30px, 3.2vw, 44px) / 1.1 var(--ns-font);
   --ns-type-h2-md: 400 clamp(26px, 2.6vw, 34px) / 1.15 var(--ns-font);
   --ns-type-h2-cta: 400 clamp(28px, 3vw, 40px) / 1.1 var(--ns-font);

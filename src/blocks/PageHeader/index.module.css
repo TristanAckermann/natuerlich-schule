@@ -9,6 +9,20 @@
   background: var(--ns-paper);
 }
 
+/*
+ * Das Symbol steht über dem Raster und nicht darin: es soll den Titel anführen,
+ * nicht die erste Rasterspalte belegen. Die Höhe ist gedeckelt, damit ein gross
+ * hochgeladenes Bild den Seitenauftakt nicht sprengt.
+ */
+.icon {
+  display: block;
+  margin: 0 0 28px;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 96px;
+}
+
 .inner {
   display: grid;
   grid-template-columns: var(--ns-col-split);
@@ -28,9 +42,17 @@
  */
 .heading {
   margin: 0;
-  font: var(--ns-type-h2-lg);
+  font: var(--ns-type-h1-page);
   letter-spacing: -0.02em;
   text-wrap: balance;
+  /*
+   * Lange deutsche Komposita („Betreuungsschlüssel") sind breiter als die
+   * schmale Titelspalte und liefen sonst in den Fliesstext hinein. `hyphens`
+   * trennt sie an den Sprachgrenzen — das <html> trägt lang="de-CH" —, und
+   * `overflow-wrap` fängt Browser ohne deutsche Trennmuster ab.
+   */
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
 .lead {
@@ -46,5 +68,10 @@
 @media (max-width: 899px) {
   .inner {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .icon {
+    margin-bottom: 20px;
+    max-height: 72px;
   }
 }
