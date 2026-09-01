@@ -30,9 +30,20 @@
    * Lange deutsche Komposita („Betreuungsschlüssel") sind breiter als die
    * schmale Titelspalte und liefen sonst in den Fliesstext hinein. `hyphens`
    * trennt sie an den Sprachgrenzen — das <html> trägt lang="de-CH" —, und
-   * `overflow-wrap` fängt Browser ohne deutsche Trennmuster ab.
+   * `overflow-wrap` fängt Browser ohne deutsche Trennmuster ab: dort bricht das
+   * Wort hart um, statt in den Fliesstext zu laufen.
+   *
+   * Das Präfix ist für Safari nötig; ohne es trennt es nicht und fällt auf den
+   * harten Umbruch zurück.
    */
+  -webkit-hyphens: auto;
   hyphens: auto;
+  /*
+   * Ohne Untergrenze trennt Chrome „Betreu-ungsschlüssel“ statt an der Wortfuge.
+   * Mindestens acht Zeichen vor dem Trennstrich schieben die Trennung auf
+   * „Betreuungs-schlüssel“. Browser ohne diese Eigenschaft trennen wie bisher.
+   */
+  hyphenate-limit-chars: 12 8 4;
   overflow-wrap: break-word;
 }
 
