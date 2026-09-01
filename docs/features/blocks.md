@@ -19,7 +19,7 @@ Neun Blocktypen, verwendet im Feld `layout` von `pages`:
 | Slug | Ordner | Zweck |
 | --- | --- | --- |
 | `hero` | `Hero/` | Kopfbereich, setzt die Akzentfarbe, optionales Video |
-| `pageHeader` | `PageHeader/` | Auftakt einer Unterseite, rendert das `h1` |
+| `pageHeader` | `PageHeader/` | Auftakt einer Unterseite, rendert das `h1`, optional mit Symbol darüber |
 | `textIntro` | `TextIntro/` | Einleitender Fliesstext |
 | `pillarCards` | `PillarCards/` | Karten mit den Schwerpunkten |
 | `dayTimeline` | `DayTimeline/` | Tagesablauf |
@@ -59,6 +59,9 @@ Keiner eigener — Blöcke sind Felder von `pages` und folgen dessen Regeln.
   `HolidayPlan/`; alles andere rendert auf dem Server.
 - Genau zwei Blöcke rendern ein `h1`: `hero` auf der Startseite und `pageHeader` auf allen
   übrigen Seiten. Eine Seite braucht einen von beiden, sonst beginnt sie auf Ebene 2.
+- Das Feld `icon` des `pageHeader` ist optional und rein dekorativ: das Bild steht über dem
+  Titel und bekommt einen leeren Alternativtext, damit Screenreader die Überschrift nicht
+  doppelt vorlesen.
 - Links entstehen über `linkField()` und werden mit `CmsLink` gerendert.
 - `timetable` bildet HTML-Tabellensemantik ab: `colSpan` und `rowSpan` verbinden Zellen,
   eine dadurch überdeckte Position wird in den Daten **nicht** erneut erfasst. Das Raster

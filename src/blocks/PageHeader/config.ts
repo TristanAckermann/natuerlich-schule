@@ -13,6 +13,20 @@ export const PageHeader: Block = {
   slug: 'pageHeader',
   fields: [
     {
+      name: 'icon',
+      type: 'upload',
+      admin: {
+        description:
+          'Optionales, rein dekoratives Symbol über dem Titel — zum Beispiel das Signet ' +
+          'der Schule. Es wird ohne Alternativtext ausgegeben, weil der Titel direkt ' +
+          'darunter steht; für ein Bild mit eigener Aussage ist dieses Feld nicht ' +
+          'gedacht. Ohne Bild beginnt die Seite direkt mit dem Titel.',
+      },
+      filterOptions: () => ({ mimeType: { like: 'image' } }),
+      label: 'Symbol',
+      relationTo: 'media',
+    },
+    {
       name: 'heading',
       type: 'textarea',
       admin: {

@@ -4,10 +4,16 @@
  * Aufruf: `pnpm seed`
  *
  * Der Seed ist idempotent — siehe `src/seed/homepage.ts`,
- * `src/seed/stundenplaene.ts` und `src/seed/ferienplan.ts`. Fehlende Assets unter
+ * `src/seed/stundenplaene.ts`, `src/seed/ferienplan.ts` und `src/seed/unterstufe.ts`. Fehlende Assets unter
  * `docs/assets/` führen zu einer Warnung, nicht zum Abbruch. Nur ein echter
  * Fehler (Datenbank nicht erreichbar, Validierung schlägt fehl) beendet den
  * Prozess mit Code 1.
+ *
+ * NACH DEM LAUF DEN DEV-SERVER NEU STARTEN. Alle Schreibzugriffe laufen mit
+ * `disableRevalidate`, weil `revalidateTag` ausserhalb eines Next-Request-Scopes
+ * nichts ausrichtet (siehe `safeRevalidate` in `src/hooks/revalidate.ts`). Ein
+ * laufender Server hält Seiten und Globals deshalb weiter im Cache und zeigt
+ * frisch verknüpfte Navigationseinträge noch als Platzhalter.
  */
 // Das Skript läuft ausserhalb des Next-Servers und der Payload-CLI — beide
 // laden .env sonst selbst.
@@ -19,6 +25,7 @@ import config from '@/payload.config'
 import { seedFerienplan } from './ferienplan'
 import { seedHomepage } from './homepage'
 import { seedStundenplaene } from './stundenplaene'
+import { seedUnterstufe } from './unterstufe'
 
 const run = async (): Promise<void> => {
   const payload = await getPayload({ config })
@@ -30,6 +37,9 @@ const run = async (): Promise<void> => {
   // Ebenfalls nach der Startseite: die Seite wird mit dem Navigationseintrag
   // verknüpft, den `seedHomepage` in der Kopfzeile anlegt.
   await seedFerienplan(payload)
+  // Ebenfalls nach der Startseite: sie legt sowohl den Navigationseintrag
+  // „Unterstufe“ als auch das Signet in der Medienbibliothek an.
+  await seedUnterstufe(payload)
 
   payload.logger.info('Seed: fertig.')
 }

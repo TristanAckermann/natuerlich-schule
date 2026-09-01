@@ -77,7 +77,11 @@ Payload-Framework-Wissen kommt aus dem Skill `.claude/skills/payload/`, nicht au
 - D1-Adapter mit `push: false` in `src/payload.config.ts`
 - `wrangler.jsonc` — Bindings D1, R2 (Medien und Next-Cache)
 - `src/seed/homepage.ts` — idempotenter Seed für Startseite und Globals
-- `src/seed/stundenplaene.ts` — idempotenter Seed für die Seite „Stundenpläne"
+- `src/seed/stundenplaene.ts` — idempotenter Seed für die Seite „Stundenpläne“
+- `src/seed/ferienplan.ts` — idempotenter Seed für die Seite „Ferienplan“
+- `src/seed/unterstufe.ts` — idempotenter Seed für die Seite „Unterstufe“
+- `src/seed/lexical.ts` — baut die Lexical-Bäume der richText-Felder
+- `src/seed/navigation.ts` — hängt eine geseedete Seite an ihren Navigationseintrag
 
 ## Tests
 

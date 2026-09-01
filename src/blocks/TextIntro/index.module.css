@@ -19,6 +19,21 @@
 .heading {
   font: var(--ns-type-h2-lg);
   letter-spacing: -0.02em;
+  /*
+   * Die Überschriftenspalte ist schmal, lange Titel brechen darin mehrfach um.
+   * `balance` verteilt die Zeilen gleichmässig, statt eine letzte Zeile mit
+   * einem einzelnen Wort stehen zu lassen. Derselbe Ausgleich wie im
+   * `pageHeader`.
+   */
+  text-wrap: balance;
+  /*
+   * Lange deutsche Komposita („Betreuungsschlüssel") sind breiter als die
+   * schmale Titelspalte und liefen sonst in den Fliesstext hinein. `hyphens`
+   * trennt sie an den Sprachgrenzen — das <html> trägt lang="de-CH" —, und
+   * `overflow-wrap` fängt Browser ohne deutsche Trennmuster ab.
+   */
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
 .body {
