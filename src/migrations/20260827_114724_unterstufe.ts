@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- generierte Migration, die Signatur ist vorgegeben */
-import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-d1-sqlite'
+import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-sqlite'
 
 /*
  * `ON DELETE set null` ist von Hand ergänzt: `ALTER TABLE … ADD` lässt die Klausel

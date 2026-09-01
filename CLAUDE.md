@@ -5,8 +5,9 @@ Router, not documentation. Load deeper context only when the task needs it.
 ## Project
 
 Payload CMS 3.88 (headless CMS + admin) on Next.js 16 App Router, React 19, TypeScript.
-Cloudflare D1 (SQLite) via `@payloadcms/db-d1-sqlite`, media on R2, deployed to Cloudflare
-Workers through OpenNext. Content, labels and code comments are German (de-CH).
+SQLite via `@payloadcms/db-sqlite` (a file on disk), media on the local filesystem,
+deployed as a plain Node.js server on Infomaniak. Content, labels and code comments are
+German (de-CH).
 
 ## Payload framework knowledge
 
@@ -18,7 +19,7 @@ what is specific to this repository — never duplicate Payload documentation in
 
 | Path | Contains |
 | --- | --- |
-| `src/payload.config.ts` | Payload config: collections, globals, D1 adapter, R2 plugin, logger |
+| `src/payload.config.ts` | Payload config: collections, globals, SQLite adapter, sharp |
 | `src/collections/` | `Users.ts`, `Media.ts`, `Pages.ts` |
 | `src/globals/` | `Header.ts` (navigation), `Footer.ts` |
 | `src/access/index.ts` | All access functions |
@@ -29,7 +30,7 @@ what is specific to this repository — never duplicate Payload documentation in
 | `src/app/(payload)/` | Admin and API routes — template-generated, do not hand-edit |
 | `src/components/` | `SiteHeader/`, `SiteFooter/`, `CmsLink`, `RichText`, `OrganizationJsonLd` |
 | `src/utilities/` | `getPage`, `getGlobals`, `generateMeta`, `generatePreviewPath`, `getURL`, `slugify` |
-| `src/migrations/` | D1 migrations + `index.ts` registry |
+| `src/migrations/` | SQLite migrations + `index.ts` registry |
 | `src/seed/` | Idempotent seed for homepage and globals |
 | `src/payload-types.ts` | Generated — never edit by hand |
 | `tests/int/`, `tests/e2e/` | Vitest (Local API) and Playwright |

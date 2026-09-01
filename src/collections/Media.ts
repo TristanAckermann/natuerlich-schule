@@ -1,6 +1,11 @@
+import path from 'path'
+import { fileURLToPath } from 'url'
+
 import type { CollectionConfig, Validate } from 'payload'
 
 import { authenticated } from '@/access'
+
+const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const isImage = (mimeType?: string | null) => Boolean(mimeType?.startsWith('image'))
 
@@ -48,10 +53,21 @@ export const Media: CollectionConfig = {
   ],
   labels: { plural: 'Medien', singular: 'Medium' },
   upload: {
-    // Auf Workers gibt es kein sharp — deshalb kein Zuschneiden, kein Fokuspunkt
-    // und keine abgeleiteten Bildgrössen.
+    /*
+     * Zuschneiden, Fokuspunkt und abgeleitete Bildgrössen sind weiterhin aus.
+     * Seit dem Wechsel auf Node ist nicht mehr das fehlende sharp der Grund,
+     * sondern das Schema: `focalPoint` bräuchte die Spalten focal_x/focal_y,
+     * `imageSizes` je eine Spaltengruppe pro Grösse. Einschalten heisst also
+     * `payload migrate:create` — eine eigene Änderung, nicht Teil des Umzugs.
+     */
     crop: false,
     focalPoint: false,
     mimeTypes: ['image/*', 'video/mp4', 'video/webm'],
+    /*
+     * Die Dateien liegen auf der Platte, nicht mehr in einem Objektspeicher.
+     * MEDIA_DIR muss auf dem Hosting ausserhalb des Deployment-Ordners liegen,
+     * sonst sind die Uploads nach dem nächsten Deployment weg.
+     */
+    staticDir: process.env.MEDIA_DIR || path.resolve(dirname, '../../media'),
   },
 }

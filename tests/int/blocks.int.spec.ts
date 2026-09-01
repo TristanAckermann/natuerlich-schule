@@ -11,7 +11,7 @@ import config from '@/payload.config'
  * nur so ist sichergestellt, dass die Regeln auch beim Speichern greifen.
  */
 
-/* Der erste getPayload()-Aufruf startet den Wrangler-Proxy — das dauert. */
+/* Der erste getPayload()-Aufruf baut Schema und Verbindung auf — das dauert. */
 const HOOK_TIMEOUT = 60_000
 
 const stamp = Date.now()

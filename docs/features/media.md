@@ -2,14 +2,13 @@
 
 ## Zweck
 
-Bilder und Videos für Seiten, Blöcke und die Kopfzeile. Die Dateien liegen in Cloudflare R2,
-die Metadaten in D1.
+Bilder und Videos für Seiten, Blöcke und die Kopfzeile. Die Dateien liegen im Dateisystem
+unter `MEDIA_DIR`, die Metadaten in der SQLite-Datenbank.
 
 ## Wichtige Dateien
 
 - `src/collections/Media.ts`
-- `src/payload.config.ts` — `r2Storage({ bucket: cloudflare.env.R2, collections: { media: true } })`
-- `wrangler.jsonc` — R2-Bindings
+- `src/collections/Media.ts` — `upload.staticDir`, gesteuert über `MEDIA_DIR`
 - `src/seed/homepage.ts` — Abgleich vorhandener Dateien über `filename`
 
 ## Daten
@@ -32,10 +31,10 @@ Hero-Video über `src/blocks/Hero/HeroVideo.tsx`. Bei Uploads über `filterOptio
 
 ## Besonderheiten
 
-Auf Cloudflare Workers gibt es kein sharp. Deshalb sind `crop` und `focalPoint`
-abgeschaltet und es entstehen **keine abgeleiteten Bildgrössen**. Wer Grössenvarianten
-braucht, muss sie beim Upload liefern oder Cloudflare Images einsetzen — `imageSizes` in
-der Collection zu ergänzen genügt nicht.
+`crop` und `focalPoint` sind abgeschaltet und es entstehen **keine abgeleiteten
+Bildgrössen**. Seit dem Wechsel auf Node ist sharp vorhanden, der Grund ist jetzt das
+Schema: `focalPoint` braucht die Spalten `focal_x`/`focal_y`, `imageSizes` je eine
+Spaltengruppe pro Grösse. Einschalten heisst deshalb `payload migrate:create`.
 
 Der Seed erkennt bereits hochgeladene Dateien am `filename` und lädt sie nicht erneut hoch.
 Fehlt eine Datei unter `docs/assets/`, warnt er nur und läuft weiter.
