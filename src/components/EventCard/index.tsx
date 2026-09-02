@@ -35,8 +35,9 @@ export type EventCardProps = {
  * Eine Eventkarte: Bild oben, Datumsfeld als Marke darüber, darunter Titel,
  * Kurzbeschreibung und Ort.
  *
- * Kein `next/image` — auf Cloudflare Workers fehlt sharp, es gibt also keine
- * Bildvarianten. Das gleiche Vorgehen wie im Hero und in der Kopfzeile.
+ * Kein `next/image` — gleiches Vorgehen wie im Hero und in der Kopfzeile.
+ * Seit dem Wechsel auf Node wäre die Bildoptimierung von Next verfügbar; ein
+ * Umstieg ist offen und würde Lighthouse helfen (siehe docs/features/media.md).
  */
 export const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const { date, description, image, location, slug, title } = event

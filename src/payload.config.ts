@@ -1,12 +1,9 @@
-import fs from 'fs'
 import path from 'path'
-import { sqliteD1Adapter } from '@payloadcms/db-d1-sqlite'
+import sharp from 'sharp'
+import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
-import { CloudflareContext, getCloudflareContext } from '@opennextjs/cloudflare'
-import { GetPlatformProxyOptions } from 'wrangler'
-import { r2Storage } from '@payloadcms/storage-r2'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -18,49 +15,14 @@ import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
-const realpath = (value: string) => {
-  try {
-    return fs.existsSync(value) ? fs.realpathSync(value) : undefined
-  } catch {
-    return undefined
-  }
-}
 
-const isCLI = process.argv.some((value) => {
-  const resolved = realpath(value)
-  if (!resolved) return false
-  return (
-    resolved.endsWith(path.join('payload', 'bin.js')) ||
-    resolved.endsWith(path.join('next', 'dist', 'bin', 'next'))
-  )
-})
-const isProduction = process.env.NODE_ENV === 'production'
-
-const createLog =
-  (level: string, fn: typeof console.log) => (objOrMsg: object | string, msg?: string) => {
-    if (typeof objOrMsg === 'string') {
-      fn(JSON.stringify({ level, msg: objOrMsg }))
-    } else {
-      fn(JSON.stringify({ level, ...objOrMsg, msg: msg ?? (objOrMsg as { msg?: string }).msg }))
-    }
-  }
-
-const cloudflareLogger = {
-  level: process.env.PAYLOAD_LOG_LEVEL || 'info',
-  trace: createLog('trace', console.debug),
-  debug: createLog('debug', console.debug),
-  info: createLog('info', console.log),
-  warn: createLog('warn', console.warn),
-  error: createLog('error', console.error),
-  fatal: createLog('fatal', console.error),
-  silent: () => {},
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- PayloadLogger wird von payload nicht exportiert
-} as any
-
-const cloudflare =
-  isCLI || !isProduction
-    ? await getCloudflareContextFromWrangler()
-    : await getCloudflareContext({ async: true })
+/*
+ * Die Datenbank ist eine einzelne SQLite-Datei. Auf dem Hosting muss
+ * DATABASE_URI auf ein Verzeichnis ausserhalb des Deployment-Ordners zeigen,
+ * sonst überschreibt sie das nächste Deployment. Lokal genügt die Datei im
+ * Projektstamm.
+ */
+const databaseURI = process.env.DATABASE_URI || `file:${path.resolve(dirname, '..', 'payload.db')}`
 
 export default buildConfig({
   admin: {
@@ -76,32 +38,27 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: sqliteD1Adapter({
-    binding: cloudflare.env.D1,
+  db: sqliteAdapter({
+    client: {
+      url: databaseURI,
+    },
     prodMigrations: migrations,
     /*
-     * Kein automatisches Schema-Push in der Entwicklung. Die lokale D1 wird wie
-     * die produktive über `payload migrate` aufgebaut; liefe zusätzlich der
-     * Dev-Push, kollidierte er mit den bereits migrierten Indizes.
+     * Kein automatisches Schema-Push in der Entwicklung. Die lokale Datenbank
+     * wird wie die produktive über `payload migrate` aufgebaut; liefe zusätzlich
+     * der Dev-Push, kollidierte er mit den bereits migrierten Indizes.
      */
     push: false,
+    /*
+     * Transaktionen waren unter D1 nicht möglich und deshalb abgeschaltet. Eine
+     * echte SQLite-Datei kann sie: Das Speichern einer Seite schreibt in ein
+     * Dutzend Block-Tabellen und ist jetzt wieder ganz oder gar nicht.
+     */
+    transactionOptions: {},
   }),
-  logger: isProduction ? cloudflareLogger : undefined,
-  plugins: [
-    r2Storage({
-      bucket: cloudflare.env.R2,
-      collections: { media: true },
-    }),
-  ],
+  /*
+   * Uploads liegen als Dateien neben der Anwendung — siehe `upload.staticDir`
+   * in src/collections/Media.ts. Es braucht deshalb kein Storage-Plugin mehr.
+   */
+  sharp,
 })
-
-// Adapted from https://github.com/opennextjs/opennextjs-cloudflare/blob/d00b3a13e42e65aad76fba41774815726422cc39/packages/cloudflare/src/api/cloudflare-context.ts#L328C36-L328C46
-function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
-  return import(/* webpackIgnore: true */ `${'__wrangler'.replaceAll('_', '')}`).then(
-    ({ getPlatformProxy }) =>
-      getPlatformProxy({
-        environment: process.env.CLOUDFLARE_ENV,
-        remoteBindings: isProduction,
-      } satisfies GetPlatformProxyOptions),
-  )
-}

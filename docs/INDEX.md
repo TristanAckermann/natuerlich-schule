@@ -7,12 +7,12 @@ Payload-Framework-Wissen kommt aus dem Skill `.claude/skills/payload/`, nicht au
 
 **Konfiguration**
 
-- `src/payload.config.ts` — Collections, Globals, D1-Adapter, R2-Plugin, Logger
+- `src/payload.config.ts` — Collections, Globals, SQLite-Adapter, sharp
 
 **Collections**
 
 - `users` → `src/collections/Users.ts` (Redaktionslogin, `auth: true`)
-- `media` → `src/collections/Media.ts` (Upload nach R2)
+- `media` → `src/collections/Media.ts` (Upload ins Dateisystem, `MEDIA_DIR`)
 - `pages` → `src/collections/Pages.ts` (Blocks, Entwürfe, SEO)
 - `events` → `src/collections/Events.ts` (Anlässe, Entwürfe, Bild aus `media`)
 
@@ -73,9 +73,9 @@ Payload-Framework-Wissen kommt aus dem Skill `.claude/skills/payload/`, nicht au
 
 ## Datenbank
 
-- `src/migrations/` — D1-Migrationen, Registry in `index.ts`
-- D1-Adapter mit `push: false` in `src/payload.config.ts`
-- `wrangler.jsonc` — Bindings D1, R2 (Medien und Next-Cache)
+- `src/migrations/` — SQLite-Migrationen, Registry in `index.ts`
+- SQLite-Adapter mit `push: false` in `src/payload.config.ts`, Datei über `DATABASE_URI`
+- `.env` — `DATABASE_URI` (SQLite-Datei) und `MEDIA_DIR` (Upload-Verzeichnis)
 - `src/seed/homepage.ts` — idempotenter Seed für Startseite und Globals
 - `src/seed/stundenplaene.ts` — idempotenter Seed für die Seite „Stundenpläne“
 - `src/seed/ferienplan.ts` — idempotenter Seed für die Seite „Ferienplan“

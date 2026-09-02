@@ -46,7 +46,7 @@ export const PageHeaderComponent: React.FC<PageHeaderBlock> = ({ heading, icon, 
   return (
     <section className={styles.section} data-block="pageHeader">
       {symbol?.url ? (
-        // eslint-disable-next-line @next/next/no-img-element -- ohne sharp gibt es auf Cloudflare Workers keine Bildvarianten
+        // eslint-disable-next-line @next/next/no-img-element -- bewusst <img>, siehe docs/features/media.md
         <img
           alt=""
           className={styles.icon}

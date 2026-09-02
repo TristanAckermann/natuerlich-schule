@@ -1,7 +1,7 @@
 /**
  * Ausführbarer Einstieg für den Seed der Inhalte.
  *
- * Aufruf: `pnpm seed`
+ * Aufruf: `npm run seed`
  *
  * Der Seed ist idempotent — siehe `src/seed/homepage.ts`,
  * `src/seed/stundenplaene.ts`, `src/seed/ferienplan.ts` und `src/seed/unterstufe.ts`. Fehlende Assets unter

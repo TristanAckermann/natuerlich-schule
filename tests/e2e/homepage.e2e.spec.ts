@@ -1,6 +1,6 @@
 // HINWEIS: Der Barrierefreiheitstest weiter unten braucht `@axe-core/playwright`.
 // Das Paket steht in den devDependencies; fehlt es im node_modules-Baum, hilft
-// `pnpm add -D @axe-core/playwright`. Der Import bleibt bewusst statisch: eine
+// `npm i -D @axe-core/playwright`. Der Import bleibt bewusst statisch: eine
 // fehlende Abhängigkeit soll auffallen, nicht stillschweigend übersprungen werden.
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Page } from '@playwright/test'

@@ -9,11 +9,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Packages with Cloudflare Workers (workerd) specific code
-  // Read more: https://opennext.js.org/cloudflare/howtos/workerd
-  serverExternalPackages: ['jose', 'pg-cloudflare'],
-
-  // Your Next.js config here
+  /*
+   * `sharp` und der libsql-Client bringen native Binärdateien mit und dürfen
+   * deshalb nicht mitgebündelt werden — Next lädt sie zur Laufzeit aus
+   * node_modules.
+   */
+  serverExternalPackages: ['sharp', '@libsql/client'],
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],

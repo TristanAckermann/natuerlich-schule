@@ -9,12 +9,12 @@ import { seedHomepage } from '@/seed/homepage'
 /**
  * Integrationstests der Collection `pages` (Spec 5.2 und 11).
  *
- * Sie laufen über die Local API gegen dieselbe lokale D1 wie `pnpm dev`.
+ * Sie laufen über die Local API gegen dieselbe SQLite-Datei wie `npm run dev`.
  * Jedes Dokument, das hier entsteht, wird in `afterAll` wieder abgeräumt;
  * die Startseite wird nur dann gelöscht, wenn dieser Lauf sie selbst angelegt hat.
  */
 
-/* Der erste getPayload()-Aufruf startet den Wrangler-Proxy — das dauert. */
+/* Der erste getPayload()-Aufruf baut Schema und Verbindung auf — das dauert. */
 const HOOK_TIMEOUT = 60_000
 const SEED_TIMEOUT = 120_000
 

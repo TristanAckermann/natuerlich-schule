@@ -7,11 +7,11 @@ import config from '@/payload.config'
 /**
  * Integrationstests der Collection `events`.
  *
- * Sie laufen über die Local API gegen dieselbe lokale D1 wie `npm run dev`.
+ * Sie laufen über die Local API gegen dieselbe SQLite-Datei wie `npm run dev`.
  * Jedes Dokument, das hier entsteht, wird in `afterAll` wieder abgeräumt.
  */
 
-/* Der erste getPayload()-Aufruf startet den Wrangler-Proxy — das dauert. */
+/* Der erste getPayload()-Aufruf baut Schema und Verbindung auf — das dauert. */
 const HOOK_TIMEOUT = 60_000
 
 const stamp = Date.now()

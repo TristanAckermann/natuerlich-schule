@@ -322,10 +322,9 @@ export const Nav: React.FC<NavProps> = ({
   /*
    * Das Logo liegt in einem Link mit aria-label — das Bild bleibt deshalb
    * dekorativ (alt=""), sonst läse ein Screenreader den Namen doppelt vor.
-   * Bewusst ein <img> statt <Image>: Auf Cloudflare Workers fehlt sharp, die
-   * Bildoptimierung von Next steht also nicht zuverlässig zur Verfügung. Ein
-   * 34px hohes Logo gewinnt dabei ohnehin nichts, und die expliziten
-   * Abmessungen aus der Media-Collection verhindern den Layoutsprung.
+   * Bewusst ein <img> statt <Image>: Ein 34px hohes Logo gewinnt durch die
+   * Bildoptimierung nichts, und die expliziten Abmessungen aus der
+   * Media-Collection verhindern den Layoutsprung.
    */
   const logoImage = logo ? (
     // eslint-disable-next-line @next/next/no-img-element -- siehe Begründung oben

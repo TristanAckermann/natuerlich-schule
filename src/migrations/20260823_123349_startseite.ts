@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- generierte Migration, die Signatur ist vorgegeben */
-import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-d1-sqlite'
+import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-sqlite'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(sql`CREATE TABLE \`pages_blocks_hero_teasers\` (
@@ -466,7 +466,15 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`height\` numeric
   );
   `)
-  await db.run(sql`INSERT INTO \`__new_media\`("id", "alt", "caption", "credit", "updated_at", "created_at", "url", "thumbnail_u_r_l", "filename", "mime_type", "filesize", "width", "height") SELECT "id", "alt", "caption", "credit", "updated_at", "created_at", "url", "thumbnail_u_r_l", "filename", "mime_type", "filesize", "width", "height" FROM \`media\`;`)
+  /*
+   * `caption` und `credit` werden hier neu eingeführt und dürfen deshalb nicht
+   * aus der alten Tabelle gelesen werden — dort gibt es sie nicht. Der Generator
+   * hat sie trotzdem in die SELECT-Liste geschrieben, was die Migration auf einer
+   * frischen Datenbank mit „no such column: caption" abbrechen liess. Beide
+   * Spalten sind nullable und bleiben für bestehende Zeilen leer; die
+   * `down`-Funktion unten macht es bereits richtig herum.
+   */
+  await db.run(sql`INSERT INTO \`__new_media\`("id", "alt", "updated_at", "created_at", "url", "thumbnail_u_r_l", "filename", "mime_type", "filesize", "width", "height") SELECT "id", "alt", "updated_at", "created_at", "url", "thumbnail_u_r_l", "filename", "mime_type", "filesize", "width", "height" FROM \`media\`;`)
   await db.run(sql`DROP TABLE \`media\`;`)
   await db.run(sql`ALTER TABLE \`__new_media\` RENAME TO \`media\`;`)
   await db.run(sql`PRAGMA foreign_keys=ON;`)

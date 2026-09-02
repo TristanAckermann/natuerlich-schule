@@ -49,6 +49,7 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 
-# OpenNext
-.open-next
-.wrangler
+# SQLite-Datenbank (lokal; auf dem Hosting ausserhalb des Deployments)
+/payload.db
+/payload.db-shm
+/payload.db-wal
